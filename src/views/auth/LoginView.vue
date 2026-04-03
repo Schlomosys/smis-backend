@@ -355,7 +355,7 @@
               d="M8 1a3.5 3.5 0 00-3.5 3.5V6H4a1 1 0 00-1 1v6a1 1 0 001 1h8a1 1 0 001-1V7a1 1 0 00-1-1h-.5V4.5A3.5 3.5 0 008 1zm2.5 5V4.5a2.5 2.5 0 00-5 0V6h5z"
             />
           </svg>
-          Plateforme sécurisée · DEDRAS {{ new Date().getFullYear() }}
+          A smile for life· DEDRAS {{ new Date().getFullYear() }}
         </p>
       </div>
     </main>

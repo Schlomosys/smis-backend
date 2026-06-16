@@ -10,12 +10,12 @@ const routes = [
   ...adminRoutes,
   ...alumniRoutes,
   ...socialRoutes,
-  { path: '/:pathMatch(.*)*', redirect: '/' }
+  { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 })
 
 setupGuards(router)

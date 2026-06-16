@@ -5,11 +5,11 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     token: null,
-    loading: false
+    loading: false,
   }),
   getters: {
-    isLoggedIn: state => !!state.token,
-    role: state => {
+    isLoggedIn: (state) => !!state.token,
+    role: (state) => {
       if (!state.user) return null
       // Handle different role structures from API
       if (state.user.role) return state.user.role
@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', {
         return state.user.roles.name || null
       }
       return null
-    }
+    },
   },
   actions: {
     async login(credentials) {
@@ -46,6 +46,6 @@ export const useAuthStore = defineStore('auth', {
       const userJson = localStorage.getItem('SMIS_USER')
       this.token = token || null
       this.user = userJson ? JSON.parse(userJson) : null
-    }
-  }
+    },
+  },
 })

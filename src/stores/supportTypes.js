@@ -69,7 +69,9 @@ export const useSupportTypeStore = defineStore('supportTypes', {
       } catch (error) {
         console.error('Error fetching support types:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors du chargement des types d appui'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors du chargement des types d appui'
         throw error
       } finally {
         this.loading = false
@@ -94,7 +96,9 @@ export const useSupportTypeStore = defineStore('supportTypes', {
       } catch (error) {
         console.error('Error fetching support type:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors du chargement du type d appui'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors du chargement du type d appui'
         throw error
       } finally {
         this.loading = false
@@ -111,7 +115,9 @@ export const useSupportTypeStore = defineStore('supportTypes', {
       } catch (error) {
         console.error('Error creating support type:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors de la creation du type d appui'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la creation du type d appui'
         throw error
       } finally {
         this.saving = false
@@ -139,7 +145,9 @@ export const useSupportTypeStore = defineStore('supportTypes', {
       } catch (error) {
         console.error('Error updating support type:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors de la mise a jour du type d appui'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la mise a jour du type d appui'
         throw error
       } finally {
         this.saving = false
@@ -166,7 +174,9 @@ export const useSupportTypeStore = defineStore('supportTypes', {
       } catch (error) {
         console.error('Error deleting support type:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors de la suppression du type d appui'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la suppression du type d appui'
         throw error
       } finally {
         this.saving = false
@@ -184,7 +194,9 @@ export const useSupportTypeStore = defineStore('supportTypes', {
       } catch (error) {
         console.error('Error fetching support type dropdown list:', error)
         this.dropdownError =
-          error.response?.data?.message || error.message || 'Erreur lors du chargement de la liste des types d appui'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors du chargement de la liste des types d appui'
         throw error
       } finally {
         this.loadingDropdown = false

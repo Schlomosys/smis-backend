@@ -7,7 +7,7 @@ export const useRegionStore = defineStore('regions', {
     items: [],
     current: null,
     referenceData: {
-      countries: []
+      countries: [],
     },
     loading: false,
     saving: false,
@@ -15,20 +15,20 @@ export const useRegionStore = defineStore('regions', {
       current_page: 1,
       last_page: 1,
       per_page: 15,
-      total: 0
+      total: 0,
     },
     filters: {
       search: '',
       country_id: '',
       sort_by: 'name',
-      sort_direction: 'asc'
+      sort_direction: 'asc',
     },
-    error: null
+    error: null,
   }),
 
   getters: {
     getById: (state) => (id) => {
-      return state.items.find(item => item.id === id) || null
+      return state.items.find((item) => item.id === id) || null
     },
 
     filteredItems: (state) => {
@@ -37,14 +37,12 @@ export const useRegionStore = defineStore('regions', {
       // Apply search filter
       if (state.filters.search) {
         const search = state.filters.search.toLowerCase()
-        items = items.filter(item =>
-          item.name.toLowerCase().includes(search)
-        )
+        items = items.filter((item) => item.name.toLowerCase().includes(search))
       }
 
       // Apply country filter
       if (state.filters.country_id) {
-        items = items.filter(item => item.country_id === state.filters.country_id)
+        items = items.filter((item) => item.country_id === state.filters.country_id)
       }
 
       // Apply sorting
@@ -62,7 +60,7 @@ export const useRegionStore = defineStore('regions', {
       return items
     },
 
-    totalRegions: (state) => state.items.length
+    totalRegions: (state) => state.items.length,
   },
 
   actions: {
@@ -87,7 +85,7 @@ export const useRegionStore = defineStore('regions', {
           page: this.pagination.current_page,
           per_page: this.pagination.per_page,
           ...this.filters,
-          ...params
+          ...params,
         })
 
         this.items = response.data
@@ -95,7 +93,7 @@ export const useRegionStore = defineStore('regions', {
           current_page: response.current_page,
           last_page: response.last_page,
           per_page: response.per_page,
-          total: response.total
+          total: response.total,
         }
       } catch (error) {
         console.error('Error fetching regions:', error)
@@ -116,7 +114,7 @@ export const useRegionStore = defineStore('regions', {
         this.current = data
 
         // Update item in list if exists
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = this.current
         }
@@ -157,7 +155,7 @@ export const useRegionStore = defineStore('regions', {
         const updatedItem = await regionService.update(id, data)
 
         // Update in list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = updatedItem
         }
@@ -186,7 +184,7 @@ export const useRegionStore = defineStore('regions', {
         await regionService.delete(id)
 
         // Remove from list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items.splice(index, 1)
           this.pagination.total--
@@ -216,6 +214,6 @@ export const useRegionStore = defineStore('regions', {
     // Reset pagination
     resetPagination() {
       this.pagination.current_page = 1
-    }
-  }
+    },
+  },
 })

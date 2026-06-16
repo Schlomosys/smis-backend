@@ -4,13 +4,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/sponsors" class="text-decoration-none">
-            Sponsors
-          </router-link>
+          <router-link to="/admin/sponsors" class="text-decoration-none"> Sponsors </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          {{ isEditing ? 'Modifier' : 'Nouveau' }} sponsor
-        </li>
+        <li class="breadcrumb-item active">{{ isEditing ? 'Modifier' : 'Nouveau' }} sponsor</li>
       </ol>
     </nav>
 
@@ -90,10 +86,7 @@
 
                 <!-- Beneficiaries Grid -->
                 <div v-else class="row g-2">
-                  <div
-                    v-if="availableBeneficiaries.length === 0"
-                    class="col-12"
-                  >
+                  <div v-if="availableBeneficiaries.length === 0" class="col-12">
                     <div class="alert alert-warning mb-0">
                       <i class="bi bi-info-circle"></i>
                       Aucun bénéficiaire disponible
@@ -122,7 +115,18 @@
                         </div>
                         <small class="text-muted">
                           Code: {{ beneficiary.unique_code }}
-                          <span v-if="beneficiary.commune"> • {{ beneficiary.commune.name }}</span>
+                          <span
+                            v-if="
+                              beneficiary.latest_academic_record?.school?.commune?.name ||
+                              beneficiary.commune?.name
+                            "
+                          >
+                            •
+                            {{
+                              beneficiary.latest_academic_record?.school?.commune?.name ||
+                              beneficiary.commune?.name
+                            }}</span
+                          >
                         </small>
                       </label>
                     </div>
@@ -143,11 +147,7 @@
                 <i class="bi bi-x-lg"></i>
                 Annuler
               </router-link>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                :disabled="sponsorStore.saving"
-              >
+              <button type="submit" class="btn btn-primary" :disabled="sponsorStore.saving">
                 <i
                   :class="sponsorStore.saving ? 'bi-hourglass-split' : 'bi-check-lg'"
                   class="bi"
@@ -185,14 +185,14 @@ const form = reactive({
   name: '',
   email: '',
   phone: '',
-  country: ''
+  country: '',
 })
 
 const errors = reactive({
   name: '',
   email: '',
   phone: '',
-  country: ''
+  country: '',
 })
 
 const selectedBeneficiaries = ref([])
@@ -208,7 +208,7 @@ onMounted(async () => {
     loadingBeneficiaries.value = true
     await beneficiaryStore.fetchAll({
       per_page: 1000, // Load all beneficiaries
-      page: 1
+      page: 1,
     })
   } catch {
     // Beneficiaries loading error - just log, don't break the form
@@ -224,11 +224,11 @@ onMounted(async () => {
         name: sponsor.name || '',
         email: sponsor.email || '',
         phone: sponsor.phone || '',
-        country: sponsor.country || ''
+        country: sponsor.country || '',
       })
       // Load existing beneficiaries
       if (sponsor.beneficiaries) {
-        selectedBeneficiaries.value = sponsor.beneficiaries.map(b => b.id)
+        selectedBeneficiaries.value = sponsor.beneficiaries.map((b) => b.id)
       }
     } catch {
       showError('Erreur lors du chargement du sponsor')
@@ -239,7 +239,7 @@ onMounted(async () => {
 
 const validateForm = () => {
   // Clear errors
-  Object.keys(errors).forEach(key => {
+  Object.keys(errors).forEach((key) => {
     errors[key] = ''
   })
 
@@ -277,7 +277,7 @@ const handleSubmit = async () => {
       email: form.email.trim() || null,
       phone: form.phone.trim() || null,
       country: form.country.trim() || null,
-      beneficiary_ids: selectedBeneficiaries.value
+      beneficiary_ids: selectedBeneficiaries.value,
     }
 
     if (isEditing.value) {
@@ -290,7 +290,7 @@ const handleSubmit = async () => {
 
     router.push('/admin/sponsors')
   } catch {
-    showError(sponsorStore.error || 'Erreur lors de l\'enregistrement')
+    showError(sponsorStore.error || "Erreur lors de l'enregistrement")
   }
 }
 </script>

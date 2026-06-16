@@ -49,7 +49,8 @@ export const useSchoolStore = defineStore('schools', {
         return this.referenceData.communes
       } catch (error) {
         console.error('Error loading communes:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement des communes'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement des communes'
         throw error
       } finally {
         this.loadingReferenceData = false
@@ -79,7 +80,8 @@ export const useSchoolStore = defineStore('schools', {
         return this.items
       } catch (error) {
         console.error('Error fetching schools:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement des ecoles'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement des ecoles'
         throw error
       } finally {
         this.loading = false
@@ -102,7 +104,8 @@ export const useSchoolStore = defineStore('schools', {
         return data
       } catch (error) {
         console.error('Error fetching school:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement de l ecole'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement de l ecole'
         throw error
       } finally {
         this.loading = false
@@ -117,7 +120,8 @@ export const useSchoolStore = defineStore('schools', {
         return await schoolService.create(data)
       } catch (error) {
         console.error('Error creating school:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la creation de l ecole'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors de la creation de l ecole'
         throw error
       } finally {
         this.saving = false
@@ -143,7 +147,10 @@ export const useSchoolStore = defineStore('schools', {
         return updated
       } catch (error) {
         console.error('Error updating school:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la mise a jour de l ecole'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la mise a jour de l ecole'
         throw error
       } finally {
         this.saving = false
@@ -167,7 +174,10 @@ export const useSchoolStore = defineStore('schools', {
         }
       } catch (error) {
         console.error('Error deleting school:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la suppression de l ecole'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la suppression de l ecole'
         throw error
       } finally {
         this.saving = false

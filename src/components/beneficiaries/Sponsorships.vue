@@ -11,7 +11,9 @@
       </button>
     </div>
 
-    <div v-if="sponsorships.length === 0" class="alert alert-info mb-0">Aucun parrainage enregistre.</div>
+    <div v-if="sponsorships.length === 0" class="alert alert-info mb-0">
+      Aucun parrainage enregistre.
+    </div>
 
     <div v-else class="row g-3">
       <div v-for="sponsorship in sponsorships" :key="sponsorship.id" class="col-lg-6">
@@ -25,7 +27,9 @@
                   <span v-if="sponsorship.end_date"> - {{ formatDate(sponsorship.end_date) }}</span>
                 </p>
               </div>
-              <span class="badge bg-primary-subtle text-primary">{{ formatAmount(sponsorship.amount) }}</span>
+              <span class="badge bg-primary-subtle text-primary">{{
+                formatAmount(sponsorship.amount)
+              }}</span>
             </div>
             <p class="mb-0 text-muted">{{ sponsorship.notes || '-' }}</p>
           </div>
@@ -33,7 +37,13 @@
       </div>
     </div>
 
-    <app-modal v-if="showModal" title="Ajouter un parrainage" size="lg" centered @close="closeModal">
+    <app-modal
+      v-if="showModal"
+      title="Ajouter un parrainage"
+      size="lg"
+      centered
+      @close="closeModal"
+    >
       <div v-if="formError" class="alert alert-danger" role="alert">{{ formError }}</div>
 
       <div class="row g-3">
@@ -48,21 +58,46 @@
           />
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.amount" type="number" label="Montant" step="0.01" :error="errors.amount" />
+          <app-form-field
+            v-model="form.amount"
+            type="number"
+            label="Montant"
+            step="0.01"
+            :error="errors.amount"
+          />
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.start_date" type="date" label="Date de debut" :error="errors.start_date" :required="true" />
+          <app-form-field
+            v-model="form.start_date"
+            type="date"
+            label="Date de debut"
+            :error="errors.start_date"
+            :required="true"
+          />
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.end_date" type="date" label="Date de fin" :error="errors.end_date" />
+          <app-form-field
+            v-model="form.end_date"
+            type="date"
+            label="Date de fin"
+            :error="errors.end_date"
+          />
         </div>
         <div class="col-12">
-          <app-form-field v-model="form.notes" type="textarea" label="Notes" :rows="4" :error="errors.notes" />
+          <app-form-field
+            v-model="form.notes"
+            type="textarea"
+            label="Notes"
+            :rows="4"
+            :error="errors.notes"
+          />
         </div>
       </div>
 
       <template #footer>
-        <button type="button" class="btn btn-secondary" :disabled="submitting" @click="closeModal">Annuler</button>
+        <button type="button" class="btn btn-secondary" :disabled="submitting" @click="closeModal">
+          Annuler
+        </button>
         <button type="button" class="btn btn-primary" :disabled="submitting" @click="handleSubmit">
           <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
           Enregistrer
@@ -107,7 +142,9 @@ const sponsorships = computed(() => {
   const value = props.beneficiary?.sponsorships || props.beneficiary?.sponsorships?.data
   return Array.isArray(value) ? value : []
 })
-const sponsors = computed(() => (Array.isArray(props.referenceData.sponsors) ? props.referenceData.sponsors : []))
+const sponsors = computed(() =>
+  Array.isArray(props.referenceData.sponsors) ? props.referenceData.sponsors : [],
+)
 
 function resetErrors() {
   Object.keys(errors).forEach((key) => delete errors[key])
@@ -120,7 +157,11 @@ function closeModal() {
 }
 
 function getSponsorName(sponsorship) {
-  return sponsorship.sponsor?.name || sponsors.value.find((item) => String(item.id) === String(sponsorship.sponsor_id))?.name || 'Sponsor inconnu'
+  return (
+    sponsorship.sponsor?.name ||
+    sponsors.value.find((item) => String(item.id) === String(sponsorship.sponsor_id))?.name ||
+    'Sponsor inconnu'
+  )
 }
 
 function formatAmount(value) {
@@ -155,7 +196,8 @@ async function handleSubmit() {
     closeModal()
     showToast({ type: 'success', message: 'Parrainage ajoute avec succes' })
   } catch (error) {
-    formError.value = error.response?.data?.message || error.message || 'Erreur lors de l ajout du parrainage'
+    formError.value =
+      error.response?.data?.message || error.message || 'Erreur lors de l ajout du parrainage'
     showToast({ type: 'error', message: 'Impossible d ajouter le parrainage' })
   } finally {
     submitting.value = false

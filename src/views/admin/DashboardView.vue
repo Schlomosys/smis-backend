@@ -33,27 +33,27 @@
         :style="`--accent: ${kpi.color}`"
       >
         <div class="kpi-skeleton" v-if="loading">
-          <div class="skel skel-icon"></div>
+          <!-- <div class="skel skel-icon"></div> -->
           <div class="skel skel-val"></div>
           <div class="skel skel-label"></div>
         </div>
 
         <template v-else>
-          <div class="kpi-top">
+          <!-- <div class="kpi-top">
             <div class="kpi-icon-wrap" :style="`background: ${kpi.color}18`">
               <span class="kpi-icon">{{ kpi.icon }}</span>
             </div>
             <div class="kpi-trend" :class="kpi.trend >= 0 ? 'trend-up' : 'trend-down'">
               <span>{{ kpi.trend >= 0 ? '↑' : '↓' }} {{ Math.abs(kpi.trend) }}%</span>
             </div>
-          </div>
+          </div> -->
           <div class="kpi-value" :style="`color: ${kpi.color}`">
             {{ kpi.formatted ?? kpi.value.toLocaleString('fr-FR') }}
           </div>
           <div class="kpi-label">{{ kpi.label }}</div>
-          <div class="kpi-bar">
+          <!-- <div class="kpi-bar">
             <div class="kpi-bar-fill" :style="`width: ${kpi.pct}%; background: ${kpi.color}`"></div>
-          </div>
+          </div> -->
         </template>
       </div>
     </div>
@@ -98,7 +98,7 @@
             <h3 class="chart-title">Statut des bénéficiaires</h3>
             <p class="chart-sub">Actifs vs Alumni</p>
           </div>
-          <div class="chart-badge" style="background: #045480">Pie</div>
+          <div class="chart-badge" style="background: #045480">STATS</div>
         </div>
         <div class="chart-wrap chart-wrap--sm">
           <div v-if="loading" class="skel skel-chart"></div>
@@ -123,7 +123,7 @@
             <h3 class="chart-title">Niveau de risque</h3>
             <p class="chart-sub">Distribution des enfants</p>
           </div>
-          <div class="chart-badge" style="background: #ff6900">Bar</div>
+          <div class="chart-badge" style="background: #ff6900">STATS</div>
         </div>
         <div class="chart-wrap chart-wrap--sm">
           <div v-if="loading" class="skel skel-chart"></div>
@@ -177,7 +177,7 @@
             <h3 class="chart-title">Répartition par sexe</h3>
             <p class="chart-sub">Garçons vs Filles</p>
           </div>
-          <div class="chart-badge" style="background: #006fb8">Donut</div>
+          <div class="chart-badge" style="background: #006fb8">STATS</div>
         </div>
         <div class="chart-wrap chart-wrap--sm">
           <div v-if="loading" class="skel skel-chart"></div>
@@ -199,18 +199,33 @@
         </div>
       </div>
 
-      <!-- Chart 5: Beneficiaries per Commune (Bar) - wide -->
+      <!-- Chart 5: Top Communes (Bar) - wide -->
       <div class="chart-card chart-card--wide">
         <div class="chart-header">
           <div>
-            <h3 class="chart-title">Bénéficiaires par commune</h3>
-            <p class="chart-sub">Top 8 communes avec le plus d'enfants suivis</p>
+            <h3 class="chart-title">Top 10 Communes</h3>
+            <p class="chart-sub">Répartition géographique des bénéficiaires</p>
           </div>
-          <div class="chart-badge" style="background: #02334d">Barre</div>
+          <div class="chart-badge" style="background: #02334d">Communes</div>
         </div>
         <div class="chart-wrap chart-wrap--commune">
           <div v-if="loading" class="skel skel-chart-wide"></div>
           <canvas v-else ref="communeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 6: Top Schools (Bar) - wide -->
+      <div class="chart-card chart-card--wide">
+        <div class="chart-header">
+          <div>
+            <h3 class="chart-title">Top 10 Établissements</h3>
+            <p class="chart-sub">Répartition par établissement scolaire</p>
+          </div>
+          <div class="chart-badge" style="background: #ff6900">Écoles</div>
+        </div>
+        <div class="chart-wrap chart-wrap--commune">
+          <div v-if="loading" class="skel skel-chart-wide"></div>
+          <canvas v-else ref="schoolChart"></canvas>
         </div>
       </div>
     </div>
@@ -271,7 +286,9 @@
                 </div>
               </td>
               <td>
-                <span class="cell-commune">{{ b.commune?.name ?? '—' }}</span>
+                <span class="cell-commune">{{
+                  b.latest_academic_record?.school?.commune?.name ?? b.commune?.name ?? '—'
+                }}</span>
               </td>
               <td>
                 <span class="status-pill" :class="`status-${b.type}`">
@@ -362,6 +379,7 @@ import { useRouter } from 'vue-router'
 import Chart from 'chart.js/auto'
 //import http from '@/services/http'
 import dashboardService from '@/services/dashboardService'
+import beneficiaryService from '@/services/beneficiaryService'
 
 const router = useRouter()
 
@@ -385,6 +403,8 @@ const stats = ref({
 const recentBeneficiaries = ref([])
 const recentSupports = ref([])
 const communeData = ref({ labels: [], values: [] })
+const topCommunesData = ref({ labels: [], values: [] })
+const topSchoolsData = ref({ labels: [], values: [] })
 const supportsOverTime = ref({ labels: [], values: [] })
 
 // ─── Chart refs ───────────────────────────────────────────────
@@ -393,6 +413,7 @@ const riskChart = ref(null)
 const lineChart = ref(null)
 const genderChart = ref(null)
 const communeChart = ref(null)
+const schoolChart = ref(null)
 
 let chartInstances = {}
 
@@ -539,7 +560,12 @@ function goTo(path) {
 async function loadAll() {
   loading.value = true
   try {
-    await Promise.all([loadStats(), loadRecentBeneficiaries(), loadRecentSupports()])
+    await Promise.all([
+      loadStats(),
+      loadRecentBeneficiaries(),
+      loadRecentSupports(),
+      loadTopReports(),
+    ])
   } catch (e) {
     console.error('Dashboard load error:', e)
     loadMockData()
@@ -547,6 +573,68 @@ async function loadAll() {
     loading.value = false
     await nextTick()
     buildAllCharts()
+  }
+}
+
+async function loadTopReports() {
+  try {
+    const [communesRes, schoolsRes] = await Promise.all([
+      beneficiaryService.getByCommune(),
+      beneficiaryService.getBySchool(),
+    ])
+
+    const rawCommunes = communesRes?.data || communesRes || []
+    const rawSchools = schoolsRes?.data || schoolsRes || []
+
+    const sortedCommunes = [...rawCommunes]
+      .sort((a, b) => (b.beneficiaries_count || 0) - (a.beneficiaries_count || 0))
+      .slice(0, 10)
+
+    const sortedSchools = [...rawSchools]
+      .sort((a, b) => (b.beneficiaries_count || 0) - (a.beneficiaries_count || 0))
+      .slice(0, 10)
+
+    topCommunesData.value = {
+      labels: sortedCommunes.map((c) => c.name || 'Inconnu'),
+      values: sortedCommunes.map((c) => c.beneficiaries_count || 0),
+    }
+
+    topSchoolsData.value = {
+      labels: sortedSchools.map((s) => s.name || 'Inconnu'),
+      values: sortedSchools.map((s) => s.beneficiaries_count || 0),
+    }
+  } catch (err) {
+    console.error('Error fetching top report statistics:', err)
+    topCommunesData.value = {
+      labels: [
+        'Cotonou',
+        'Porto-Novo',
+        'Abomey',
+        'Parakou',
+        'Bohicon',
+        'Natitingou',
+        'Lokossa',
+        'Ouidah',
+        'Kandi',
+        'Djougou',
+      ],
+      values: [58, 47, 42, 38, 35, 29, 25, 21, 18, 15],
+    }
+    topSchoolsData.value = {
+      labels: [
+        'Collège XYZ',
+        'Collège ABC',
+        'École Publique A',
+        'Complexe Scolaire B',
+        'Lycée Technique C',
+        'École Primaire D',
+        'Collège Moderne E',
+        'Lycée des Jeunes F',
+        'École G',
+        'Institut H',
+      ],
+      values: [25, 20, 18, 15, 12, 10, 8, 7, 5, 4],
+    }
   }
 }
 
@@ -615,6 +703,36 @@ function loadMockData() {
     ],
     values: [58, 47, 42, 38, 35, 29, 25, 21],
   }
+  topCommunesData.value = {
+    labels: [
+      'Cotonou',
+      'Porto-Novo',
+      'Abomey',
+      'Parakou',
+      'Bohicon',
+      'Natitingou',
+      'Lokossa',
+      'Ouidah',
+      'Kandi',
+      'Djougou',
+    ],
+    values: [58, 47, 42, 38, 35, 29, 25, 21, 18, 15],
+  }
+  topSchoolsData.value = {
+    labels: [
+      'Collège XYZ',
+      'Collège ABC',
+      'École Publique A',
+      'Complexe Scolaire B',
+      'Lycée Technique C',
+      'École Primaire D',
+      'Collège Moderne E',
+      'Lycée des Jeunes F',
+      'École G',
+      'Institut H',
+    ],
+    values: [25, 20, 18, 15, 12, 10, 8, 7, 5, 4],
+  }
   supportsOverTime.value = {
     labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
     values: [1_200_000, 1_850_000, 2_100_000, 2_800_000, 3_400_000, 4_200_000],
@@ -652,6 +770,7 @@ function buildAllCharts() {
   buildLineChart()
   buildGenderChart()
   buildCommuneChart()
+  buildSchoolChart()
 }
 
 function buildPieChart() {
@@ -790,13 +909,43 @@ function buildCommuneChart() {
   chartInstances.commune = new Chart(communeChart.value, {
     type: 'bar',
     data: {
-      labels: communeData.value.labels,
+      labels: topCommunesData.value.labels,
       datasets: [
         {
           label: 'Bénéficiaires',
-          data: communeData.value.values,
-          backgroundColor: communeData.value.values.map((_, i) =>
+          data: topCommunesData.value.values,
+          backgroundColor: topCommunesData.value.values.map((_, i) =>
             i === 0 ? '#045480' : `rgba(4,84,128,${0.85 - i * 0.08})`,
+          ),
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      indexAxis: 'y',
+      scales: {
+        x: { grid: { color: '#f0f0f0' }, ticks: { font: { family: 'DM Sans' } } },
+        y: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 12 } } },
+      },
+    },
+  })
+}
+
+function buildSchoolChart() {
+  destroyChart('school')
+  if (!schoolChart.value) return
+  chartInstances.school = new Chart(schoolChart.value, {
+    type: 'bar',
+    data: {
+      labels: topSchoolsData.value.labels,
+      datasets: [
+        {
+          label: 'Bénéficiaires',
+          data: topSchoolsData.value.values,
+          backgroundColor: topSchoolsData.value.values.map((_, i) =>
+            i === 0 ? '#ff6900' : `rgba(255,105,0,${0.85 - i * 0.08})`,
           ),
           borderRadius: 6,
           borderSkipped: false,
@@ -1035,7 +1184,7 @@ onMounted(loadAll)
 .kpi-card {
   background: #fff;
   border-radius: 14px;
-  padding: 20px 18px 16px;
+  padding: 24px 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   border-top: 3px solid var(--accent);
   transition:
@@ -1080,18 +1229,18 @@ onMounted(loadAll)
   color: #991b1b;
 }
 .kpi-value {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   line-height: 1.1;
   font-family: 'DM Mono', monospace;
 }
 .kpi-label {
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: #6b7c93;
   font-weight: 500;
   letter-spacing: 0.3px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 .kpi-bar {
   height: 3px;

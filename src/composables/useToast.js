@@ -11,7 +11,7 @@ export function useToast() {
       title: options.title || '',
       duration: options.duration || 5000,
       persistent: options.persistent || false,
-      ...options
+      ...options,
     }
 
     toasts.value.push(toast)
@@ -27,7 +27,7 @@ export function useToast() {
   }
 
   const removeToast = (id) => {
-    const index = toasts.value.findIndex(toast => toast.id === id)
+    const index = toasts.value.findIndex((toast) => toast.id === id)
     if (index !== -1) {
       toasts.value.splice(index, 1)
     }
@@ -41,7 +41,7 @@ export function useToast() {
     return showToast({
       type: 'success',
       message,
-      ...options
+      ...options,
     })
   }
 
@@ -49,7 +49,7 @@ export function useToast() {
     return showToast({
       type: 'error',
       message,
-      ...options
+      ...options,
     })
   }
 
@@ -57,7 +57,7 @@ export function useToast() {
     return showToast({
       type: 'warning',
       message,
-      ...options
+      ...options,
     })
   }
 
@@ -65,7 +65,7 @@ export function useToast() {
     return showToast({
       type: 'info',
       message,
-      ...options
+      ...options,
     })
   }
 
@@ -77,6 +77,6 @@ export function useToast() {
     success,
     error,
     warning,
-    info
+    info,
   }
 }

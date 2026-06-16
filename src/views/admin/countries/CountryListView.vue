@@ -143,9 +143,7 @@
               <strong>{{ selectedCountry?.name }}</strong>
               ?
             </p>
-            <p class="text-muted small">
-              Cette action est irréversible.
-            </p>
+            <p class="text-muted small">Cette action est irréversible.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -155,10 +153,7 @@
               :disabled="countryStore.saving"
               @click="handleConfirmDelete"
             >
-              <span
-                v-if="countryStore.saving"
-                class="spinner-border spinner-border-sm me-2"
-              ></span>
+              <span v-if="countryStore.saving" class="spinner-border spinner-border-sm me-2"></span>
               Supprimer
             </button>
           </div>

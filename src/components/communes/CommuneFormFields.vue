@@ -24,11 +24,7 @@
         <option value="">
           {{ loadingRegions ? 'Chargement des regions...' : 'Selectionner une region' }}
         </option>
-        <option
-          v-for="region in regions"
-          :key="region.id"
-          :value="String(region.id)"
-        >
+        <option v-for="region in regions" :key="region.id" :value="String(region.id)">
           {{ region.name }}
         </option>
       </template>

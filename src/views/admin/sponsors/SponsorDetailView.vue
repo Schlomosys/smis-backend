@@ -4,13 +4,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/sponsors" class="text-decoration-none">
-            Sponsors
-          </router-link>
+          <router-link to="/admin/sponsors" class="text-decoration-none"> Sponsors </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          Détails du sponsor
-        </li>
+        <li class="breadcrumb-item active">Détails du sponsor</li>
       </ol>
     </nav>
 
@@ -110,7 +106,9 @@
 
                 <!-- Updated At -->
                 <div class="col-md-6">
-                  <label class="form-label text-muted small fw-semibold">Dernière modification</label>
+                  <label class="form-label text-muted small fw-semibold"
+                    >Dernière modification</label
+                  >
                   <p class="mb-0">
                     {{ formatDate(sponsorStore.current.updated_at) }}
                   </p>
@@ -128,7 +126,10 @@
               </h5>
             </div>
             <div class="card-body">
-              <div v-if="sponsorStore.current.beneficiaries.length === 0" class="text-muted text-center py-3">
+              <div
+                v-if="sponsorStore.current.beneficiaries.length === 0"
+                class="text-muted text-center py-3"
+              >
                 <p class="mb-0">Aucun bénéficiaire associé</p>
               </div>
               <div v-else class="table-responsive">
@@ -142,17 +143,29 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="beneficiary in sponsorStore.current.beneficiaries" :key="beneficiary.id">
+                    <tr
+                      v-for="beneficiary in sponsorStore.current.beneficiaries"
+                      :key="beneficiary.id"
+                    >
                       <td class="fw-semibold">
                         {{ beneficiary.first_name }} {{ beneficiary.last_name }}
                       </td>
                       <td>
                         <span class="badge bg-info">{{ beneficiary.unique_code }}</span>
                       </td>
-                      <td>{{ beneficiary.commune?.name || '-' }}</td>
+                      <td>
+                        {{
+                          beneficiary.latest_academic_record?.school?.commune?.name ||
+                          beneficiary.commune?.name ||
+                          '-'
+                        }}
+                      </td>
                       <td>
                         <router-link
-                          :to="{ name: 'admin-beneficiaries-detail', params: { id: beneficiary.id } }"
+                          :to="{
+                            name: 'admin-beneficiaries-detail',
+                            params: { id: beneficiary.id },
+                          }"
                           class="btn btn-sm btn-outline-primary"
                           title="Voir détails"
                         >
@@ -207,10 +220,7 @@
               </h5>
             </div>
             <div class="card-body d-flex flex-column gap-2">
-              <router-link
-                to="/admin/sponsors"
-                class="btn btn-outline-secondary btn-sm"
-              >
+              <router-link to="/admin/sponsors" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-arrow-left"></i>
                 Retour à la liste
               </router-link>
@@ -265,7 +275,7 @@ const formatDate = (date) => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 

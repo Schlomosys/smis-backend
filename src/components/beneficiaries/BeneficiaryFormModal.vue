@@ -1,12 +1,5 @@
 <template>
-  <app-modal
-    v-if="show"
-    :title="modalTitle"
-    size="xl"
-    centered
-    scrollable
-    @close="handleClose"
-  >
+  <app-modal v-if="show" :title="modalTitle" size="xl" centered scrollable @close="handleClose">
     <div v-if="formError" class="alert alert-danger mb-3" role="alert">
       {{ formError }}
     </div>
@@ -88,12 +81,18 @@
           <beneficiary-reference-select
             v-model="form.school_id"
             label="Ecole"
-            :placeholder="form.commune_id ? 'Selectionner une ecole' : 'Selectionner une commune d abord'"
+            :placeholder="
+              form.commune_id ? 'Selectionner une ecole' : 'Selectionner une commune d abord'
+            "
             :options="availableSchools"
             :error="errors.school_id"
             :required="true"
             :disabled="!form.commune_id"
-            :help="form.commune_id && availableSchools.length === 0 ? 'Aucune ecole disponible pour cette commune.' : ''"
+            :help="
+              form.commune_id && availableSchools.length === 0
+                ? 'Aucune ecole disponible pour cette commune.'
+                : ''
+            "
           />
         </div>
         <div class="col-md-6">
@@ -175,12 +174,18 @@ const riskOptions = [
 ]
 
 const isEditing = computed(() => Boolean(props.beneficiary?.id))
-const modalTitle = computed(() => (isEditing.value ? 'Modifier le beneficiaire' : 'Nouveau beneficiaire'))
+const modalTitle = computed(() =>
+  isEditing.value ? 'Modifier le beneficiaire' : 'Nouveau beneficiaire',
+)
 const communes = computed(() => normalizeList(props.referenceData.communes))
 const schools = computed(() => normalizeList(props.referenceData.schools))
 const sponsors = computed(() => normalizeList(props.referenceData.sponsors))
 const families = computed(() =>
-  normalizeList(props.referenceData.families || props.referenceData.family_profiles || props.referenceData.familyProfiles),
+  normalizeList(
+    props.referenceData.families ||
+      props.referenceData.family_profiles ||
+      props.referenceData.familyProfiles,
+  ),
 )
 
 const availableSchools = computed(() => {
@@ -205,7 +210,9 @@ watch(
   () => form.commune_id,
   () => {
     if (!form.school_id) return
-    const stillExists = availableSchools.value.some((school) => String(school.id) === String(form.school_id))
+    const stillExists = availableSchools.value.some(
+      (school) => String(school.id) === String(form.school_id),
+    )
     if (!stillExists) {
       form.school_id = ''
     }
@@ -229,7 +236,9 @@ function populateForm() {
   form.risk_level = props.beneficiary?.risk_level || ''
   form.commune_id = props.beneficiary?.commune_id ? String(props.beneficiary.commune_id) : ''
   form.school_id = props.beneficiary?.school_id ? String(props.beneficiary.school_id) : ''
-  form.family_profile_id = props.beneficiary?.family_profile_id ? String(props.beneficiary.family_profile_id) : ''
+  form.family_profile_id = props.beneficiary?.family_profile_id
+    ? String(props.beneficiary.family_profile_id)
+    : ''
   form.sponsor_id = props.beneficiary?.sponsor_id ? String(props.beneficiary.sponsor_id) : ''
 }
 

@@ -3,19 +3,19 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/schools" class="text-decoration-none">
-            Ecoles
-          </router-link>
+          <router-link to="/admin/schools" class="text-decoration-none"> Ecoles </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          {{ isEditing ? 'Modifier' : 'Nouvelle' }} ecole
-        </li>
+        <li class="breadcrumb-item active">{{ isEditing ? 'Modifier' : 'Nouvelle' }} ecole</li>
       </ol>
     </nav>
 
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div v-if="schoolStore.error && !schoolStore.loading" class="alert alert-danger" role="alert">
+        <div
+          v-if="schoolStore.error && !schoolStore.loading"
+          class="alert alert-danger"
+          role="alert"
+        >
           {{ schoolStore.error }}
         </div>
 
@@ -47,7 +47,10 @@
                 class="btn btn-primary"
                 :disabled="schoolStore.saving || initialLoading"
               >
-                <span v-if="schoolStore.saving" class="spinner-border spinner-border-sm me-2"></span>
+                <span
+                  v-if="schoolStore.saving"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
                 <i class="bi bi-check-lg"></i>
                 Enregistrer
               </button>

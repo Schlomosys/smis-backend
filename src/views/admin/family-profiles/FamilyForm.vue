@@ -15,7 +15,11 @@
 
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div v-if="familyStore.error && !familyStore.loading" class="alert alert-danger" role="alert">
+        <div
+          v-if="familyStore.error && !familyStore.loading"
+          class="alert alert-danger"
+          role="alert"
+        >
           {{ familyStore.error }}
         </div>
 
@@ -32,10 +36,7 @@
               <app-spinner v-if="initialLoading" />
 
               <template v-else>
-                <family-form-fields
-                  v-model="form"
-                  :errors="errors"
-                />
+                <family-form-fields v-model="form" :errors="errors" />
               </template>
             </div>
 
@@ -45,7 +46,10 @@
                 class="btn btn-primary"
                 :disabled="familyStore.saving || initialLoading"
               >
-                <span v-if="familyStore.saving" class="spinner-border spinner-border-sm me-2"></span>
+                <span
+                  v-if="familyStore.saving"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
                 <i class="bi bi-check-lg"></i>
                 Enregistrer
               </button>

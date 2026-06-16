@@ -20,11 +20,7 @@
     >
       <template #options>
         <option value="">Selectionner un type</option>
-        <option
-          v-for="option in typeOptions"
-          :key="option.value"
-          :value="option.value"
-        >
+        <option v-for="option in typeOptions" :key="option.value" :value="option.value">
           {{ option.label }}
         </option>
       </template>
@@ -45,11 +41,7 @@
         <option value="">
           {{ loadingCommunes ? 'Chargement des communes...' : 'Selectionner une commune' }}
         </option>
-        <option
-          v-for="commune in communes"
-          :key="commune.id"
-          :value="String(commune.id)"
-        >
+        <option v-for="commune in communes" :key="commune.id" :value="String(commune.id)">
           {{ commune.name }}
         </option>
       </template>

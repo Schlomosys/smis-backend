@@ -50,7 +50,9 @@ export const useFamilyProfileStore = defineStore('familyProfiles', {
       } catch (error) {
         console.error('Error fetching family profiles:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors du chargement des profils familiaux'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors du chargement des profils familiaux'
         throw error
       } finally {
         this.loading = false
@@ -74,7 +76,9 @@ export const useFamilyProfileStore = defineStore('familyProfiles', {
       } catch (error) {
         console.error('Error fetching family profile:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors du chargement du profil familial'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors du chargement du profil familial'
         throw error
       } finally {
         this.loading = false
@@ -90,7 +94,9 @@ export const useFamilyProfileStore = defineStore('familyProfiles', {
       } catch (error) {
         console.error('Error creating family profile:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors de la creation du profil familial'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la creation du profil familial'
         throw error
       } finally {
         this.saving = false
@@ -117,7 +123,9 @@ export const useFamilyProfileStore = defineStore('familyProfiles', {
       } catch (error) {
         console.error('Error updating family profile:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors de la mise a jour du profil familial'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la mise a jour du profil familial'
         throw error
       } finally {
         this.saving = false
@@ -142,7 +150,9 @@ export const useFamilyProfileStore = defineStore('familyProfiles', {
       } catch (error) {
         console.error('Error deleting family profile:', error)
         this.error =
-          error.response?.data?.message || error.message || 'Erreur lors de la suppression du profil familial'
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la suppression du profil familial'
         throw error
       } finally {
         this.saving = false

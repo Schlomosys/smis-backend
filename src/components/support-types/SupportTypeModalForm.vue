@@ -1,11 +1,5 @@
 <template>
-  <app-modal
-    v-if="show"
-    :title="modalTitle"
-    size="lg"
-    centered
-    @close="handleClose"
-  >
+  <app-modal v-if="show" :title="modalTitle" size="lg" centered @close="handleClose">
     <div v-if="formError" class="alert alert-danger mb-3" role="alert">
       {{ formError }}
     </div>

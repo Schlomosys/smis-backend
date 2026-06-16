@@ -23,6 +23,6 @@
 
 <script>
 export default {
-  name: 'MunicipalityListView'
+  name: 'MunicipalityListView',
 }
 </script>

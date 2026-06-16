@@ -1,16 +1,8 @@
 <template>
   <teleport to="body">
-    <div
-      v-if="show"
-      class="modal-backdrop"
-      @click.self="handleBackdropClick"
-    >
+    <div v-if="show" class="modal-backdrop" @click.self="handleBackdropClick">
       <div
-        :class="[
-          'modal',
-          { 'fade': animate },
-          { 'show': show }
-        ]"
+        :class="['modal', { fade: animate }, { show: show }]"
         :style="{ display: show ? 'block' : 'none' }"
         tabindex="-1"
         role="dialog"
@@ -22,7 +14,7 @@
             { 'modal-xl': size === 'xl' },
             { 'modal-sm': size === 'sm' },
             { 'modal-dialog-centered': centered },
-            { 'modal-dialog-scrollable': scrollable }
+            { 'modal-dialog-scrollable': scrollable },
           ]"
           role="document"
         >
@@ -65,39 +57,39 @@ export default defineComponent({
   props: {
     title: {
       type: String,
-      default: ''
+      default: '',
     },
     closable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     size: {
       type: String,
       default: 'md',
-      validator: (value) => ['sm', 'md', 'lg', 'xl'].includes(value)
+      validator: (value) => ['sm', 'md', 'lg', 'xl'].includes(value),
     },
     centered: {
       type: Boolean,
-      default: false
+      default: false,
     },
     scrollable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     animate: {
       type: Boolean,
-      default: true
+      default: true,
     },
     backdrop: {
       type: [Boolean, String],
       default: true,
-      validator: (value) => [true, false, 'static'].includes(value)
-    }
+      validator: (value) => [true, false, 'static'].includes(value),
+    },
   },
   emits: ['close', 'show', 'shown', 'hide', 'hidden'],
   data() {
     return {
-      show: false
+      show: false,
     }
   },
   mounted() {
@@ -130,8 +122,8 @@ export default defineComponent({
       if (this.backdrop === true) {
         this.close()
       }
-    }
-  }
+    },
+  },
 })
 </script>
 

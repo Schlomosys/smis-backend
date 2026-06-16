@@ -12,19 +12,19 @@ export const useSponsorStore = defineStore('sponsors', {
       current_page: 1,
       last_page: 1,
       per_page: 15,
-      total: 0
+      total: 0,
     },
     filters: {
       search: '',
       sort_by: 'created_at',
-      sort_direction: 'desc'
+      sort_direction: 'desc',
     },
-    error: null
+    error: null,
   }),
 
   getters: {
     getById: (state) => (id) => {
-      return state.items.find(item => item.id === id) || null
+      return state.items.find((item) => item.id === id) || null
     },
 
     filteredItems: (state) => {
@@ -33,10 +33,11 @@ export const useSponsorStore = defineStore('sponsors', {
       // Apply search filter
       if (state.filters.search) {
         const search = state.filters.search.toLowerCase()
-        items = items.filter(item =>
-          (item.name && item.name.toLowerCase().includes(search)) ||
-          (item.email && item.email.toLowerCase().includes(search)) ||
-          (item.phone && item.phone.toLowerCase().includes(search))
+        items = items.filter(
+          (item) =>
+            (item.name && item.name.toLowerCase().includes(search)) ||
+            (item.email && item.email.toLowerCase().includes(search)) ||
+            (item.phone && item.phone.toLowerCase().includes(search)),
         )
       }
 
@@ -55,7 +56,7 @@ export const useSponsorStore = defineStore('sponsors', {
       return items
     },
 
-    totalSponsors: (state) => state.items.length
+    totalSponsors: (state) => state.items.length,
   },
 
   actions: {
@@ -69,7 +70,7 @@ export const useSponsorStore = defineStore('sponsors', {
           page: this.pagination.current_page,
           per_page: this.pagination.per_page,
           ...this.filters,
-          ...params
+          ...params,
         })
 
         // Handle both paginated and non-paginated responses
@@ -83,13 +84,14 @@ export const useSponsorStore = defineStore('sponsors', {
               current_page: response.current_page,
               last_page: response.last_page,
               per_page: response.per_page,
-              total: response.total
+              total: response.total,
             }
           }
         }
       } catch (error) {
         console.error('Error fetching sponsors:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement des sponsors'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement des sponsors'
         throw error
       } finally {
         this.loading = false
@@ -107,7 +109,8 @@ export const useSponsorStore = defineStore('sponsors', {
         return this.current
       } catch (error) {
         console.error('Error fetching sponsor:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement du sponsor'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement du sponsor'
         throw error
       } finally {
         this.loading = false
@@ -127,7 +130,8 @@ export const useSponsorStore = defineStore('sponsors', {
         return newSponsor
       } catch (error) {
         console.error('Error creating sponsor:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la création du sponsor'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors de la création du sponsor'
         throw error
       } finally {
         this.saving = false
@@ -144,7 +148,7 @@ export const useSponsorStore = defineStore('sponsors', {
         const updatedSponsor = response.data || response
 
         // Update in items list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = updatedSponsor
         }
@@ -157,7 +161,10 @@ export const useSponsorStore = defineStore('sponsors', {
         return updatedSponsor
       } catch (error) {
         console.error('Error updating sponsor:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la mise à jour du sponsor'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la mise à jour du sponsor'
         throw error
       } finally {
         this.saving = false
@@ -173,7 +180,7 @@ export const useSponsorStore = defineStore('sponsors', {
         await sponsorService.delete(id)
 
         // Remove from items list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items.splice(index, 1)
         }
@@ -184,7 +191,10 @@ export const useSponsorStore = defineStore('sponsors', {
         }
       } catch (error) {
         console.error('Error deleting sponsor:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la suppression du sponsor'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la suppression du sponsor'
         throw error
       } finally {
         this.deleting = false
@@ -202,7 +212,7 @@ export const useSponsorStore = defineStore('sponsors', {
       this.filters = {
         search: '',
         sort_by: 'created_at',
-        sort_direction: 'desc'
+        sort_direction: 'desc',
       }
       this.pagination.current_page = 1
     },
@@ -229,7 +239,7 @@ export const useSponsorStore = defineStore('sponsors', {
         }
 
         // Remove deleted items from list
-        this.items = this.items.filter(item => !ids.includes(item.id))
+        this.items = this.items.filter((item) => !ids.includes(item.id))
 
         // Clear current if deleted
         if (this.current && ids.includes(this.current.id)) {
@@ -237,11 +247,12 @@ export const useSponsorStore = defineStore('sponsors', {
         }
       } catch (error) {
         console.error('Error bulk deleting sponsors:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la suppression'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors de la suppression'
         throw error
       } finally {
         this.deleting = false
       }
-    }
-  }
+    },
+  },
 })

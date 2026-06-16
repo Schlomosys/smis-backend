@@ -13,14 +13,26 @@
 
     <academic-timeline :records="records" editable @add-record="showModal = true" />
 
-    <app-modal v-if="showModal" title="Ajouter un suivi scolaire" size="lg" centered @close="closeModal">
+    <app-modal
+      v-if="showModal"
+      title="Ajouter un suivi scolaire"
+      size="lg"
+      centered
+      @close="closeModal"
+    >
       <div v-if="formError" class="alert alert-danger" role="alert">
         {{ formError }}
       </div>
 
       <div class="row g-3">
         <div class="col-md-6">
-          <app-form-field v-model="form.year" type="number" label="Annee" :error="errors.year" :required="true" />
+          <app-form-field
+            v-model="form.year"
+            type="number"
+            label="Annee"
+            :error="errors.year"
+            :required="true"
+          />
         </div>
         <div class="col-md-6">
           <beneficiary-reference-select
@@ -33,7 +45,12 @@
           />
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.class_name" label="Classe" :error="errors.class_name" :required="true" />
+          <app-form-field
+            v-model="form.class_name"
+            label="Classe"
+            :error="errors.class_name"
+            :required="true"
+          />
         </div>
         <div class="col-md-6">
           <app-form-field
@@ -46,23 +63,38 @@
           >
             <template #options>
               <option value="">Selectionner un resultat</option>
-              <option v-for="option in resultOptions" :key="option" :value="option">{{ option }}</option>
+              <option v-for="option in resultOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
             </template>
           </app-form-field>
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.score" type="number" label="Score" step="0.01" :error="errors.score" />
+          <app-form-field
+            v-model="form.score"
+            type="number"
+            label="Score"
+            step="0.01"
+            :error="errors.score"
+          />
         </div>
         <div class="col-md-6 d-flex align-items-end">
           <div class="form-check mb-3">
-            <input id="academic-present" v-model="form.is_present" class="form-check-input" type="checkbox" />
+            <input
+              id="academic-present"
+              v-model="form.is_present"
+              class="form-check-input"
+              type="checkbox"
+            />
             <label class="form-check-label" for="academic-present">Presence confirmee</label>
           </div>
         </div>
       </div>
 
       <template #footer>
-        <button type="button" class="btn btn-secondary" :disabled="submitting" @click="closeModal">Annuler</button>
+        <button type="button" class="btn btn-secondary" :disabled="submitting" @click="closeModal">
+          Annuler
+        </button>
         <button type="button" class="btn btn-primary" :disabled="submitting" @click="handleSubmit">
           <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
           Enregistrer
@@ -106,10 +138,15 @@ const form = reactive({
 
 const resultOptions = ['En cours', 'Admis', 'Redoublant', 'Abandon']
 const records = computed(() => {
-  const value = props.beneficiary?.academicRecords || props.beneficiary?.academic_records || props.beneficiary?.academic_records?.data
+  const value =
+    props.beneficiary?.academicRecords ||
+    props.beneficiary?.academic_records ||
+    props.beneficiary?.academic_records?.data
   return Array.isArray(value) ? value : []
 })
-const schools = computed(() => (Array.isArray(props.referenceData.schools) ? props.referenceData.schools : []))
+const schools = computed(() =>
+  Array.isArray(props.referenceData.schools) ? props.referenceData.schools : [],
+)
 
 function resetErrors() {
   Object.keys(errors).forEach((key) => delete errors[key])
@@ -151,7 +188,8 @@ async function handleSubmit() {
     closeModal()
     showToast({ type: 'success', message: 'Suivi scolaire ajoute avec succes' })
   } catch (error) {
-    formError.value = error.response?.data?.message || error.message || 'Erreur lors de l ajout du suivi scolaire'
+    formError.value =
+      error.response?.data?.message || error.message || 'Erreur lors de l ajout du suivi scolaire'
     showToast({ type: 'error', message: 'Impossible d ajouter le suivi scolaire' })
   } finally {
     submitting.value = false

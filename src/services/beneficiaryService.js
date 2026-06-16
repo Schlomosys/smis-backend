@@ -13,6 +13,7 @@ class BeneficiaryService {
 
   async getById(id) {
     const response = await http.get(`/beneficiaries/${id}`)
+    console.log('beneficiaries', response.data)
     return response.data
   }
 
@@ -20,8 +21,8 @@ class BeneficiaryService {
     const config = this.isFormData(data)
       ? {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         }
       : {}
 
@@ -34,8 +35,8 @@ class BeneficiaryService {
       data.append('_method', 'PUT')
       const response = await http.post(`/beneficiaries/${id}`, data, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       })
       return response.data
     }
@@ -61,12 +62,17 @@ class BeneficiaryService {
   }
 
   async updateAcademicRecord(beneficiaryId, recordId, data) {
-    const response = await http.put(`/beneficiaries/${beneficiaryId}/academic-records/${recordId}`, data)
+    const response = await http.put(
+      `/beneficiaries/${beneficiaryId}/academic-records/${recordId}`,
+      data,
+    )
     return response.data
   }
 
   async deleteAcademicRecord(beneficiaryId, recordId) {
-    const response = await http.delete(`/beneficiaries/${beneficiaryId}/academic-records/${recordId}`)
+    const response = await http.delete(
+      `/beneficiaries/${beneficiaryId}/academic-records/${recordId}`,
+    )
     return response.data
   }
 
@@ -127,12 +133,17 @@ class BeneficiaryService {
   }
 
   async updateSponsorship(beneficiaryId, sponsorshipId, data) {
-    const response = await http.put(`/beneficiaries/${beneficiaryId}/sponsorships/${sponsorshipId}`, data)
+    const response = await http.put(
+      `/beneficiaries/${beneficiaryId}/sponsorships/${sponsorshipId}`,
+      data,
+    )
     return response.data
   }
 
   async deleteSponsorship(beneficiaryId, sponsorshipId) {
-    const response = await http.delete(`/beneficiaries/${beneficiaryId}/sponsorships/${sponsorshipId}`)
+    const response = await http.delete(
+      `/beneficiaries/${beneficiaryId}/sponsorships/${sponsorshipId}`,
+    )
     return response.data
   }
 
@@ -145,8 +156,8 @@ class BeneficiaryService {
   async uploadDocument(beneficiaryId, formData) {
     const response = await http.post(`/beneficiaries/${beneficiaryId}/documents`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     })
     return response.data
   }
@@ -172,7 +183,7 @@ class BeneficiaryService {
   async export(params = {}) {
     const response = await http.get('/beneficiaries/export', {
       params,
-      responseType: 'blob'
+      responseType: 'blob',
     })
     return response.data
   }
@@ -191,7 +202,7 @@ class BeneficiaryService {
   // Search
   async search(query, params = {}) {
     const response = await http.get('/beneficiaries/search', {
-      params: { q: query, ...params }
+      params: { q: query, ...params },
     })
     return response.data
   }
@@ -200,7 +211,7 @@ class BeneficiaryService {
   async updateRiskLevel(beneficiaryId, riskLevel, notes = '') {
     const response = await http.put(`/beneficiaries/${beneficiaryId}/risk-level`, {
       risk_level: riskLevel,
-      notes
+      notes,
     })
     return response.data
   }
@@ -209,7 +220,7 @@ class BeneficiaryService {
   async updateGlobalScore(beneficiaryId, score, notes = '') {
     const response = await http.put(`/beneficiaries/${beneficiaryId}/global-score`, {
       global_score: score,
-      notes
+      notes,
     })
     return response.data
   }
@@ -222,6 +233,19 @@ class BeneficiaryService {
 
   async reactivateBeneficiary(beneficiaryId, data = {}) {
     const response = await http.post(`/beneficiaries/${beneficiaryId}/reactivate`, data)
+    return response.data
+  }
+
+  // Group by reports
+  async getBySchool() {
+    const response = await http.get('/reports/beneficiaries/by-school')
+    console.log('Get by school', response.data)
+    return response.data
+  }
+
+  async getByCommune() {
+    const response = await http.get('/reports/beneficiaries/by-commune')
+    console.log('Get by commune', response.data)
     return response.data
   }
 }

@@ -4,8 +4,14 @@
       <table class="app-table">
         <thead>
           <tr>
-            <th v-for="col in columns" :key="col.key" :style="col.width ? `width:${col.width}` : ''">
-              {{ col.label }}
+            <th
+              v-for="col in columns"
+              :key="col.key"
+              :style="col.width ? `width:${col.width}` : ''"
+            >
+              <slot :name="`header-${col.key}`" :column="col">
+                {{ col.label }}
+              </slot>
             </th>
           </tr>
         </thead>
@@ -87,7 +93,9 @@ defineEmits(['row-click'])
 }
 
 .app-table__row {
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .app-table__row:nth-child(even) {

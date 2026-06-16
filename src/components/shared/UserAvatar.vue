@@ -1,22 +1,10 @@
 <template>
   <div
-    :class="[
-      'user-avatar',
-      sizeClass,
-      { 'd-inline-flex': !block }
-    ]"
+    :class="['user-avatar', sizeClass, { 'd-inline-flex': !block }]"
     :style="{ background: photoUrl ? 'transparent' : gradient }"
   >
-    <img
-      v-if="photoUrl"
-      :src="photoUrl"
-      :alt="`${firstName} ${lastName}`"
-      class="avatar-image"
-    />
-    <span
-      v-else
-      class="avatar-initials"
-    >
+    <img v-if="photoUrl" :src="photoUrl" :alt="`${firstName} ${lastName}`" class="avatar-image" />
+    <span v-else class="avatar-initials">
       {{ initials }}
     </span>
   </div>
@@ -30,25 +18,25 @@ export default defineComponent({
   props: {
     firstName: {
       type: String,
-      required: true
+      required: true,
     },
     lastName: {
       type: String,
-      required: true
+      required: true,
     },
     photoUrl: {
       type: String,
-      default: null
+      default: null,
     },
     size: {
       type: String,
       default: 'md',
-      validator: (value) => ['xs', 'sm', 'md', 'lg', 'xl'].includes(value)
+      validator: (value) => ['xs', 'sm', 'md', 'lg', 'xl'].includes(value),
     },
     block: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {
     initials() {
@@ -63,11 +51,11 @@ export default defineComponent({
         'linear-gradient(135deg, #045480 0%, #006fb8 100%)',
         'linear-gradient(135deg, #02334d 0%, #045480 100%)',
         'linear-gradient(135deg, #006fb8 0%, #4da3d9 100%)',
-        'linear-gradient(135deg, #045480 0%, #ff6900 100%)'
+        'linear-gradient(135deg, #045480 0%, #ff6900 100%)',
       ]
       return colors[hash % colors.length]
-    }
-  }
+    },
+  },
 })
 </script>
 

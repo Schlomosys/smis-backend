@@ -4,13 +4,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/countries" class="text-decoration-none">
-            Pays
-          </router-link>
+          <router-link to="/admin/countries" class="text-decoration-none"> Pays </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          Détails du pays
-        </li>
+        <li class="breadcrumb-item active">Détails du pays</li>
       </ol>
     </nav>
 
@@ -22,7 +18,10 @@
           Détails du pays
         </h4>
         <div>
-          <router-link :to="`/admin/countries/${route.params.id}/edit`" class="btn btn-outline-primary btn-sm">
+          <router-link
+            :to="`/admin/countries/${route.params.id}/edit`"
+            class="btn btn-outline-primary btn-sm"
+          >
             <i class="bi bi-pencil"></i>
             Modifier
           </router-link>
@@ -48,12 +47,12 @@ export default defineComponent({
 
     return {
       router,
-      route
+      route,
     }
   },
   async mounted() {
     // Load country details
     console.log('Load country details', this.route.params.id)
-  }
+  },
 })
 </script>

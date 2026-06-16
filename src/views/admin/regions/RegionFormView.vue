@@ -4,13 +4,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/regions" class="text-decoration-none">
-            Régions
-          </router-link>
+          <router-link to="/admin/regions" class="text-decoration-none"> Régions </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          {{ isEditing ? 'Modifier' : 'Nouvelle' }} région
-        </li>
+        <li class="breadcrumb-item active">{{ isEditing ? 'Modifier' : 'Nouvelle' }} région</li>
       </ol>
     </nav>
 
@@ -28,7 +24,9 @@
           <form @submit.prevent="handleSubmit">
             <div class="card-body">
               <div class="mb-3">
-                <label for="name" class="form-label">Nom de la région <span class="text-danger">*</span></label>
+                <label for="name" class="form-label"
+                  >Nom de la région <span class="text-danger">*</span></label
+                >
                 <input
                   id="name"
                   v-model="form.name"
@@ -43,7 +41,9 @@
                 </div>
               </div>
               <div class="mb-3">
-                <label for="country_id" class="form-label">Pays <span class="text-danger">*</span></label>
+                <label for="country_id" class="form-label"
+                  >Pays <span class="text-danger">*</span></label
+                >
                 <select
                   id="country_id"
                   v-model="form.country_id"
@@ -66,11 +66,7 @@
               </div>
             </div>
             <div class="card-footer">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                :disabled="regionStore.saving"
-              >
+              <button type="submit" class="btn btn-primary" :disabled="regionStore.saving">
                 <span
                   v-if="regionStore.saving"
                   class="spinner-border spinner-border-sm me-2"
@@ -122,7 +118,7 @@ export default defineComponent({
   computed: {
     isEditing() {
       return !!this.route.params.id
-    }
+    },
   },
   async mounted() {
     await this.initialize()

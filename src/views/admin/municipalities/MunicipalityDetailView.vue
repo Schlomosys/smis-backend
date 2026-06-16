@@ -8,9 +8,7 @@
             Communes
           </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          Détails de la commune
-        </li>
+        <li class="breadcrumb-item active">Détails de la commune</li>
       </ol>
     </nav>
 
@@ -22,7 +20,10 @@
           Détails de la commune
         </h4>
         <div>
-          <router-link :to="`/admin/municipalities/${route.params.id}/edit`" class="btn btn-outline-primary btn-sm">
+          <router-link
+            :to="`/admin/municipalities/${route.params.id}/edit`"
+            class="btn btn-outline-primary btn-sm"
+          >
             <i class="bi bi-pencil"></i>
             Modifier
           </router-link>
@@ -48,12 +49,12 @@ export default defineComponent({
 
     return {
       router,
-      route
+      route,
     }
   },
   async mounted() {
     // Load municipality details
     console.log('Load municipality details', this.route.params.id)
-  }
+  },
 })
 </script>

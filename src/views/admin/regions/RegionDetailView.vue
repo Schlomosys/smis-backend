@@ -4,13 +4,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/regions" class="text-decoration-none">
-            Régions
-          </router-link>
+          <router-link to="/admin/regions" class="text-decoration-none"> Régions </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          Détails de la région
-        </li>
+        <li class="breadcrumb-item active">Détails de la région</li>
       </ol>
     </nav>
 
@@ -22,7 +18,10 @@
           Détails de la région
         </h4>
         <div>
-          <router-link :to="`/admin/regions/${route.params.id}/edit`" class="btn btn-outline-primary btn-sm">
+          <router-link
+            :to="`/admin/regions/${route.params.id}/edit`"
+            class="btn btn-outline-primary btn-sm"
+          >
             <i class="bi bi-pencil"></i>
             Modifier
           </router-link>
@@ -48,12 +47,12 @@ export default defineComponent({
 
     return {
       router,
-      route
+      route,
     }
   },
   async mounted() {
     // Load region details
     console.log('Load region details', this.route.params.id)
-  }
+  },
 })
 </script>

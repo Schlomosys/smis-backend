@@ -7,11 +7,7 @@
         <p class="text-muted small">Gestion complète des sponsors</p>
       </div>
       <div class="btn-group" role="group">
-        <button
-          @click="handleExportCSV"
-          class="btn btn-outline-secondary"
-          title="Exporter en CSV"
-        >
+        <button @click="handleExportCSV" class="btn btn-outline-secondary" title="Exporter en CSV">
           <i class="bi bi-download"></i>
           Exporter
         </button>
@@ -59,16 +55,16 @@
     </div>
 
     <!-- BULK ACTIONS BAR -->
-    <div v-if="selectedIds.size > 0" class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+    <div
+      v-if="selectedIds.size > 0"
+      class="alert alert-info d-flex justify-content-between align-items-center mb-4"
+    >
       <div>
         <i class="bi bi-exclamation-circle"></i>
         <strong>{{ selectedIds.size }} sponsor(s) sélectionné(s)</strong>
       </div>
       <div class="btn-group btn-group-sm">
-        <button
-          @click="handleResetSelection"
-          class="btn btn-outline-secondary"
-        >
+        <button @click="handleResetSelection" class="btn btn-outline-secondary">
           <i class="bi bi-x-lg"></i>
           Annuler
         </button>
@@ -90,7 +86,10 @@
     </div>
 
     <!-- EMPTY STATE -->
-    <div v-else-if="sponsorStore.filteredItems.length === 0" class="alert alert-info text-center py-5">
+    <div
+      v-else-if="sponsorStore.filteredItems.length === 0"
+      class="alert alert-info text-center py-5"
+    >
       <i class="bi bi-inbox"></i>
       <p class="mb-0 mt-2">Aucun sponsor trouvé</p>
     </div>
@@ -121,60 +120,54 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sponsor in sponsorStore.filteredItems" :key="sponsor.id">
+            <tr v-for="item in sponsorStore.filteredItems" :key="item.id">
               <td>
                 <input
                   type="checkbox"
                   class="form-check-input"
-                  :checked="selectedIds.has(sponsor.id)"
-                  @change="(e) => toggleSelect(sponsor.id, e.target.checked)"
+                  :checked="selectedIds.has(item.id)"
+                  @change="(e) => toggleSelect(item.id, e.target.checked)"
                 />
               </td>
               <td class="fw-semibold">
                 <router-link
-                  :to="{ name: 'admin-sponsors-detail', params: { id: sponsor.id } }"
+                  :to="{ name: 'admin-sponsors-detail', params: { id: item.id } }"
                   class="text-decoration-none"
                 >
-                  {{ sponsor.name }}
+                  {{ item.name }}
                 </router-link>
               </td>
               <td>
-                <a v-if="sponsor.email" :href="`mailto:${sponsor.email}`" class="text-decoration-none">
-                  {{ sponsor.email }}
+                <a v-if="item.email" :href="`mailto:${item.email}`" class="text-decoration-none">
+                  {{ item.email }}
                 </a>
                 <span v-else class="text-muted">-</span>
               </td>
               <td>
-                <a v-if="sponsor.phone" :href="`tel:${sponsor.phone}`" class="text-decoration-none">
-                  {{ sponsor.phone }}
+                <a v-if="item.phone" :href="`tel:${item.phone}`" class="text-decoration-none">
+                  {{ item.phone }}
                 </a>
                 <span v-else class="text-muted">-</span>
               </td>
-              <td>{{ sponsor.country || '-' }}</td>
+              <td>{{ item.country || '-' }}</td>
               <td class="text-center">
-                <div class="btn-group btn-group-sm" role="group">
-                  <router-link
-                    :to="{ name: 'admin-sponsors-detail', params: { id: sponsor.id } }"
-                    class="btn btn-outline-info"
-                    title="Voir détails"
-                  >
-                    <i class="bi bi-eye"></i>
-                  </router-link>
-                  <router-link
-                    :to="{ name: 'admin-sponsors-edit', params: { id: sponsor.id } }"
-                    class="btn btn-outline-primary"
+                <div class="action-row">
+                  <button
+                    type="button"
+                    class="icon-action icon-action--secondary"
+                    @click.stop="editItem(item)"
                     title="Modifier"
                   >
-                    <i class="bi bi-pencil"></i>
-                  </router-link>
+                    Modifier
+                  </button>
+
                   <button
-                    @click="handleDelete(sponsor.id, sponsor.name)"
-                    class="btn btn-outline-danger"
+                    type="button"
+                    class="icon-action icon-action--danger"
+                    @click.stop="deleteItem(item)"
                     title="Supprimer"
-                    :disabled="sponsorStore.deleting"
                   >
-                    <i v-if="sponsorStore.deleting && deletingId === sponsor.id" class="bi bi-hourglass-split"></i>
-                    <i v-else class="bi bi-trash"></i>
+                    Supprimer
                   </button>
                 </div>
               </td>
@@ -198,11 +191,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSponsorStore } from '@/stores/sponsors.js'
 import { useToast } from '@/composables/useToast.js'
 import AppSpinner from '@/components/ui/AppSpinner.vue'
 import AppPagination from '@/components/ui/AppPagination.vue'
 
+const router = useRouter()
 const sponsorStore = useSponsorStore()
 const { success, error: showError } = useToast()
 
@@ -211,15 +206,13 @@ const deletingId = ref(null)
 const selectedIds = ref(new Set())
 
 const sortIcon = computed(() => {
-  return sponsorStore.filters.sort_direction === 'desc'
-    ? 'bi-arrow-down'
-    : 'bi-arrow-up'
+  return sponsorStore.filters.sort_direction === 'desc' ? 'bi-arrow-down' : 'bi-arrow-up'
 })
 
 const allSelected = computed(() => {
   return (
     sponsorStore.filteredItems.length > 0 &&
-    sponsorStore.filteredItems.every(item => selectedIds.value.has(item.id))
+    sponsorStore.filteredItems.every((item) => selectedIds.value.has(item.id))
   )
 })
 
@@ -242,7 +235,7 @@ const sortBy = (field) => {
   } else {
     sponsorStore.setFilters({
       sort_by: field,
-      sort_direction: 'asc'
+      sort_direction: 'asc',
     })
   }
 }
@@ -276,6 +269,14 @@ const handleDelete = async (id, name) => {
   }
 }
 
+const editItem = (item) => {
+  router.push({ name: 'admin-sponsors-edit', params: { id: item.id } })
+}
+
+const deleteItem = (item) => {
+  handleDelete(item.id, item.name)
+}
+
 // Bulk Actions
 const toggleSelect = (id, checked) => {
   if (checked) {
@@ -287,7 +288,7 @@ const toggleSelect = (id, checked) => {
 
 const toggleSelectAll = (event) => {
   if (event.target.checked) {
-    sponsorStore.filteredItems.forEach(item => {
+    sponsorStore.filteredItems.forEach((item) => {
       selectedIds.value.add(item.id)
     })
   } else {
@@ -314,9 +315,8 @@ const handleBulkDelete = async () => {
 
 // CSV Export
 const handleExportCSV = () => {
-  const items = sponsorStore.filteredItems.length > 0 
-    ? sponsorStore.filteredItems 
-    : sponsorStore.items
+  const items =
+    sponsorStore.filteredItems.length > 0 ? sponsorStore.filteredItems : sponsorStore.items
 
   if (items.length === 0) {
     showError('Aucun sponsor à exporter')
@@ -325,33 +325,30 @@ const handleExportCSV = () => {
 
   // CSV headers
   const headers = ['ID', 'Nom', 'Email', 'Téléphone', 'Pays', 'Créé', 'Modifié']
-  
+
   // CSV rows
-  const rows = items.map(sponsor => [
+  const rows = items.map((sponsor) => [
     sponsor.id,
     `"${(sponsor.name || '').replace(/"/g, '""')}"`,
     `"${(sponsor.email || '').replace(/"/g, '""')}"`,
     `"${(sponsor.phone || '').replace(/"/g, '""')}"`,
     `"${(sponsor.country || '').replace(/"/g, '""')}"`,
     new Date(sponsor.created_at).toLocaleDateString('fr-FR'),
-    new Date(sponsor.updated_at).toLocaleDateString('fr-FR')
+    new Date(sponsor.updated_at).toLocaleDateString('fr-FR'),
   ])
 
   // Create CSV content
-  const csv = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n')
+  const csv = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n')
 
   // Download CSV
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
-  
+
   link.setAttribute('href', url)
   link.setAttribute('download', `sponsors-${new Date().toISOString().split('T')[0]}.csv`)
   link.click()
-  
+
   URL.revokeObjectURL(url)
   success('Sponsors exportés avec succès')
 }
@@ -380,5 +377,37 @@ const handleExportCSV = () => {
 .btn-group-sm .btn {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+}
+
+.icon-action {
+  border: 0;
+  border-radius: 999px;
+  background: #ff6900;
+  color: #ffffff;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.icon-action:hover {
+  transform: translateY(-1px);
+}
+
+.icon-action--secondary {
+  background: #045480;
+}
+
+.icon-action--danger {
+  background: #fff1e8;
+  color: #cc5200;
 }
 </style>

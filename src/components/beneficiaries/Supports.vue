@@ -20,7 +20,9 @@
             <div class="d-flex justify-content-between align-items-start gap-3">
               <div>
                 <h6 class="mb-1">{{ getSupportTypeName(support) }}</h6>
-                <p class="text-muted small mb-2">{{ formatDate(support.provided_at || support.date) || '-' }}</p>
+                <p class="text-muted small mb-2">
+                  {{ formatDate(support.provided_at || support.date) || '-' }}
+                </p>
               </div>
               <span class="badge bg-light text-dark">{{ formatAmount(support.amount) }}</span>
             </div>
@@ -45,18 +47,37 @@
           />
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.amount" type="number" label="Montant" step="0.01" :error="errors.amount" />
+          <app-form-field
+            v-model="form.amount"
+            type="number"
+            label="Montant"
+            step="0.01"
+            :error="errors.amount"
+          />
         </div>
         <div class="col-md-6">
-          <app-form-field v-model="form.provided_at" type="date" label="Date" :error="errors.provided_at" />
+          <app-form-field
+            v-model="form.provided_at"
+            type="date"
+            label="Date"
+            :error="errors.provided_at"
+          />
         </div>
         <div class="col-12">
-          <app-form-field v-model="form.notes" type="textarea" label="Notes" :rows="4" :error="errors.notes" />
+          <app-form-field
+            v-model="form.notes"
+            type="textarea"
+            label="Notes"
+            :rows="4"
+            :error="errors.notes"
+          />
         </div>
       </div>
 
       <template #footer>
-        <button type="button" class="btn btn-secondary" :disabled="submitting" @click="closeModal">Annuler</button>
+        <button type="button" class="btn btn-secondary" :disabled="submitting" @click="closeModal">
+          Annuler
+        </button>
         <button type="button" class="btn btn-primary" :disabled="submitting" @click="handleSubmit">
           <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
           Enregistrer
@@ -100,7 +121,9 @@ const supports = computed(() => {
   const value = props.beneficiary?.supports || props.beneficiary?.supports?.data
   return Array.isArray(value) ? value : []
 })
-const supportTypes = computed(() => props.referenceData.supportTypes || props.referenceData.support_types || [])
+const supportTypes = computed(
+  () => props.referenceData.supportTypes || props.referenceData.support_types || [],
+)
 
 function resetErrors() {
   Object.keys(errors).forEach((key) => delete errors[key])
@@ -113,7 +136,12 @@ function closeModal() {
 }
 
 function getSupportTypeName(support) {
-  return support.supportType?.name || support.support_type?.name || supportTypes.value.find((item) => String(item.id) === String(support.support_type_id))?.name || 'Type inconnu'
+  return (
+    support.supportType?.name ||
+    support.support_type?.name ||
+    supportTypes.value.find((item) => String(item.id) === String(support.support_type_id))?.name ||
+    'Type inconnu'
+  )
 }
 
 function formatAmount(value) {
@@ -146,7 +174,8 @@ async function handleSubmit() {
     closeModal()
     showToast({ type: 'success', message: 'Appui ajoute avec succes' })
   } catch (error) {
-    formError.value = error.response?.data?.message || error.message || 'Erreur lors de l ajout de l appui'
+    formError.value =
+      error.response?.data?.message || error.message || 'Erreur lors de l ajout de l appui'
     showToast({ type: 'error', message: 'Impossible d ajouter l appui' })
   } finally {
     submitting.value = false

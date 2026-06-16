@@ -2,8 +2,8 @@
   <section class="beneficiary-list-page">
     <header class="page-hero">
       <div>
-        <p class="page-hero__eyebrow">Beneficiaries</p>
-        <h1 class="page-hero__title">Gestion des beneficiaires</h1>
+        <p class="page-hero__eyebrow">Bénéficiaires</p>
+        <h1 class="page-hero__title">Gestion des bénéficiaires</h1>
         <p class="page-hero__copy">
           Recherchez, filtrez et suivez les beneficiaires du programme dans une vue plus claire et
           plus rapide.
@@ -12,7 +12,7 @@
 
       <button type="button" class="cta-button" @click="goToCreate">
         <span class="cta-button__icon">+</span>
-        Ajouter un beneficiaire
+        Ajouter un bénéficiaire
       </button>
     </header>
 
@@ -20,7 +20,7 @@
       <article class="summary-card">
         <span class="summary-card__label">Total</span>
         <strong>{{ beneficiaryStore.pagination.total || 0 }}</strong>
-        <small>beneficiaires enregistres</small>
+        <small>bénéficiaires enregistrés</small>
       </article>
 
       <article class="summary-card">
@@ -32,7 +32,7 @@
       <article class="summary-card">
         <span class="summary-card__label">Alumni</span>
         <strong>{{ alumniCount }}</strong>
-        <small>beneficiaires sortis du programme</small>
+        <small>bénéficiaires sortis du programme</small>
       </article>
     </section>
 
@@ -158,46 +158,117 @@
           :rows="beneficiaryStore.items"
           :loading="beneficiaryStore.loading"
         >
-          <template #cell-full_name="{ row }">
-            <div class="person-cell">
-              <UserAvatar
-                :first-name="row.first_name || 'N'"
-                :last-name="row.last_name || 'A'"
-                :photo-url="resolvePhoto(row)"
-                size="sm"
-              />
-              <div>
-                <div class="person-cell__name">{{ getFullName(row) }}</div>
-                <div class="person-cell__meta">{{ row.unique_code || 'Code indisponible' }}</div>
-              </div>
-            </div>
+          <!-- Headers slots for sorting -->
+          <template #header-name="{ column }">
+            <a href="#" @click.prevent="sortBy('last_name')" class="sort-header-link">
+              {{ column.label }}
+              <span
+                class="sort-arrow"
+                v-if="filters.sort_by === 'last_name' || filters.sort_by === 'name'"
+              >
+                {{ filters.sort_direction === 'desc' ? ' ↓' : ' ↑' }}
+              </span>
+            </a>
+          </template>
+          <template #header-school="{ column }">
+            <a href="#" @click.prevent="sortBy('school')" class="sort-header-link">
+              {{ column.label }}
+              <span class="sort-arrow" v-if="filters.sort_by === 'school'">
+                {{ filters.sort_direction === 'desc' ? ' ↓' : ' ↑' }}
+              </span>
+            </a>
+          </template>
+          <template #header-commune="{ column }">
+            <a href="#" @click.prevent="sortBy('commune')" class="sort-header-link">
+              {{ column.label }}
+              <span class="sort-arrow" v-if="filters.sort_by === 'commune'">
+                {{ filters.sort_direction === 'desc' ? ' ↓' : ' ↑' }}
+              </span>
+            </a>
+          </template>
+          <template #header-country="{ column }">
+            <a href="#" @click.prevent="sortBy('country')" class="sort-header-link">
+              {{ column.label }}
+              <span class="sort-arrow" v-if="filters.sort_by === 'country'">
+                {{ filters.sort_direction === 'desc' ? ' ↓' : ' ↑' }}
+              </span>
+            </a>
+          </template>
+
+          <!-- Cells slots -->
+          <template #cell-photo="{ row }">
+            <img
+              v-if="row.photo_url"
+              :src="row.photo_url"
+              class="beneficiary-avatar beneficiary-avatar--sm"
+            />
+            <UserAvatar
+              v-else
+              :first-name="row.first_name || 'N'"
+              :last-name="row.last_name || 'A'"
+              :photo-url="null"
+              size="sm"
+            />
+          </template>
+
+          <template #cell-code="{ row }">
+            {{ row.unique_code || '—' }}
+          </template>
+
+          <template #cell-name="{ row }">
+            <strong>{{ getFullName(row) }}</strong>
+          </template>
+
+          <template #cell-gender="{ row }">
+            {{
+              row.gender === 'male' || row.gender === 'M'
+                ? 'M'
+                : row.gender === 'female' || row.gender === 'F'
+                  ? 'F'
+                  : row.gender || '—'
+            }}
+          </template>
+
+          <template #cell-school="{ row }">
+            {{ row.latest_academic_record?.school?.name ?? '—' }}
+          </template>
+
+          <template #cell-commune="{ row }">
+            {{ row.latest_academic_record?.school?.commune?.name ?? '—' }}
+          </template>
+
+          <template #cell-country="{ row }">
+            {{ row.latest_academic_record?.school?.commune?.region?.country?.name ?? '—' }}
           </template>
 
           <template #cell-type="{ row }">
-            <span :class="['status-pill', row.type === 'alumni' ? 'status-pill--muted' : 'status-pill--active']">
+            <span
+              :class="[
+                'status-pill',
+                row.type === 'alumni' ? 'status-pill--muted' : 'status-pill--active',
+              ]"
+            >
               {{ row.type === 'alumni' ? 'Alumni' : 'Actif' }}
             </span>
           </template>
 
-          <template #cell-risk_level="{ row }">
-            <risk-badge :level="row.risk_level || 'low'" />
-          </template>
-
-          <template #cell-commune="{ row }">
-            {{ row.commune?.name || findById(communes, row.commune_id)?.name || '-' }}
-          </template>
-
-          <template #cell-school="{ row }">
-            {{ row.school?.name || findById(schools, row.school_id)?.name || '-' }}
-          </template>
-
           <template #cell-actions="{ row }">
             <div class="action-row">
-              <button type="button" class="icon-action" @click.stop="goToDetails(row.id)">Voir</button>
-              <button type="button" class="icon-action icon-action--secondary" @click.stop="goToEdit(row.id)">
+              <button type="button" class="icon-action" @click.stop="goToDetails(row.id)">
+                Voir
+              </button>
+              <button
+                type="button"
+                class="icon-action icon-action--secondary"
+                @click.stop="goToEdit(row.id)"
+              >
                 Modifier
               </button>
-              <button type="button" class="icon-action icon-action--danger" @click.stop="openDeleteModal(row)">
+              <button
+                type="button"
+                class="icon-action icon-action--danger"
+                @click.stop="openDeleteModal(row)"
+              >
                 Supprimer
               </button>
             </div>
@@ -213,10 +284,16 @@
           @click="goToDetails(row.id)"
         >
           <div class="beneficiary-card__header">
+            <img
+              v-if="row.photo_url"
+              :src="row.photo_url"
+              class="beneficiary-avatar beneficiary-avatar--md"
+            />
             <UserAvatar
+              v-else
               :first-name="row.first_name || 'N'"
               :last-name="row.last_name || 'A'"
-              :photo-url="resolvePhoto(row)"
+              :photo-url="null"
               size="md"
             />
             <div>
@@ -226,7 +303,12 @@
           </div>
 
           <div class="beneficiary-card__tags">
-            <span :class="['status-pill', row.type === 'alumni' ? 'status-pill--muted' : 'status-pill--active']">
+            <span
+              :class="[
+                'status-pill',
+                row.type === 'alumni' ? 'status-pill--muted' : 'status-pill--active',
+              ]"
+            >
               {{ row.type === 'alumni' ? 'Alumni' : 'Actif' }}
             </span>
             <risk-badge :level="row.risk_level || 'low'" />
@@ -234,18 +316,30 @@
 
           <dl class="beneficiary-card__details">
             <div>
-              <dt>Commune</dt>
-              <dd>{{ row.commune?.name || findById(communes, row.commune_id)?.name || '-' }}</dd>
+              <dt>École</dt>
+              <dd>{{ row.latest_academic_record?.school?.name ?? '—' }}</dd>
             </div>
             <div>
-              <dt>Ecole</dt>
-              <dd>{{ row.school?.name || findById(schools, row.school_id)?.name || '-' }}</dd>
+              <dt>Commune</dt>
+              <dd>{{ row.latest_academic_record?.school?.commune?.name ?? '—' }}</dd>
+            </div>
+            <div>
+              <dt>Pays</dt>
+              <dd>
+                {{ row.latest_academic_record?.school?.commune?.region?.country?.name ?? '—' }}
+              </dd>
             </div>
           </dl>
 
           <div class="beneficiary-card__actions">
-            <button type="button" class="icon-action" @click.stop="goToDetails(row.id)">Voir</button>
-            <button type="button" class="icon-action icon-action--secondary" @click.stop="goToEdit(row.id)">
+            <button type="button" class="icon-action" @click.stop="goToDetails(row.id)">
+              Voir
+            </button>
+            <button
+              type="button"
+              class="icon-action icon-action--secondary"
+              @click.stop="goToEdit(row.id)"
+            >
               Modifier
             </button>
           </div>
@@ -267,7 +361,12 @@
       />
     </div>
 
-    <app-modal v-if="showDeleteModal" title="Supprimer le beneficiaire" centered @close="closeDeleteModal">
+    <app-modal
+      v-if="showDeleteModal"
+      title="Supprimer le beneficiaire"
+      centered
+      @close="closeDeleteModal"
+    >
       <p class="mb-2">
         Voulez-vous vraiment supprimer
         <strong>{{ selectedBeneficiary ? getFullName(selectedBeneficiary) : '' }}</strong>
@@ -276,10 +375,20 @@
       <p class="text-muted small mb-0">Cette action est irreversible.</p>
 
       <template #footer>
-        <button type="button" class="btn btn-secondary" :disabled="beneficiaryStore.saving" @click="closeDeleteModal">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          :disabled="beneficiaryStore.saving"
+          @click="closeDeleteModal"
+        >
           Annuler
         </button>
-        <button type="button" class="btn btn-danger" :disabled="beneficiaryStore.saving" @click="confirmDelete">
+        <button
+          type="button"
+          class="btn btn-danger"
+          :disabled="beneficiaryStore.saving"
+          @click="confirmDelete"
+        >
           <span v-if="beneficiaryStore.saving" class="spinner-border spinner-border-sm me-2"></span>
           Supprimer
         </button>
@@ -310,15 +419,20 @@ const filters = reactive({
   commune_id: '',
   type: '',
   risk_level: '',
+  sort_by: 'created_at',
+  sort_direction: 'desc',
 })
 
 const tableColumns = [
-  { key: 'full_name', label: 'Beneficiaire' },
-  { key: 'type', label: 'Type' },
-  { key: 'risk_level', label: 'Risque' },
+  { key: 'photo', label: 'Photo' },
+  { key: 'code', label: 'Code' },
+  { key: 'name', label: 'Bénéficiaire' },
+  { key: 'gender', label: 'Sexe' },
+  { key: 'school', label: 'École' },
   { key: 'commune', label: 'Commune' },
-  { key: 'school', label: 'Ecole' },
-  { key: 'actions', label: 'Actions', width: '220px' },
+  { key: 'country', label: 'Pays' },
+  { key: 'type', label: 'Statut' },
+  { key: 'actions', label: 'Actions', width: '200px' },
 ]
 
 const selectedBeneficiary = ref(null)
@@ -327,9 +441,22 @@ const viewMode = ref('table')
 
 const communes = computed(() => beneficiaryStore.referenceData.communes || [])
 const schools = computed(() => beneficiaryStore.referenceData.schools || [])
-const hasActiveFilters = computed(() => Boolean(filters.search || filters.commune_id || filters.type || filters.risk_level))
-const activeCount = computed(() => beneficiaryStore.items.filter((item) => item.type !== 'alumni').length)
-const alumniCount = computed(() => beneficiaryStore.items.filter((item) => item.type === 'alumni').length)
+const hasActiveFilters = computed(() =>
+  Boolean(
+    filters.search ||
+    filters.commune_id ||
+    filters.type ||
+    filters.risk_level ||
+    filters.sort_by !== 'created_at' ||
+    filters.sort_direction !== 'desc',
+  ),
+)
+const activeCount = computed(
+  () => beneficiaryStore.items.filter((item) => item.type !== 'alumni').length,
+)
+const alumniCount = computed(
+  () => beneficiaryStore.items.filter((item) => item.type === 'alumni').length,
+)
 
 onMounted(async () => {
   await initialize()
@@ -350,6 +477,8 @@ async function fetchBeneficiaries() {
     commune_id: filters.commune_id,
     type: filters.type,
     risk_level: filters.risk_level,
+    sort_by: filters.sort_by,
+    sort_direction: filters.sort_direction,
   })
 
   try {
@@ -369,9 +498,21 @@ function resetFilters() {
   filters.commune_id = ''
   filters.type = ''
   filters.risk_level = ''
+  filters.sort_by = 'created_at'
+  filters.sort_direction = 'desc'
   beneficiaryStore.resetFilters()
   beneficiaryStore.setPage(1)
   fetchBeneficiaries()
+}
+
+function sortBy(field) {
+  if (filters.sort_by === field) {
+    filters.sort_direction = filters.sort_direction === 'desc' ? 'asc' : 'desc'
+  } else {
+    filters.sort_by = field
+    filters.sort_direction = 'asc'
+  }
+  applyFilters()
 }
 
 function handlePageChange(page) {
@@ -725,7 +866,9 @@ async function confirmDelete() {
   gap: 1rem;
   padding: 1.25rem;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .beneficiary-card:hover {
@@ -790,5 +933,34 @@ async function confirmDelete() {
   .card-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+.sort-header-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+.sort-header-link:hover {
+  color: #ff6900;
+}
+.sort-arrow {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+.beneficiary-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 24px rgba(2, 51, 77, 0.18);
+}
+.beneficiary-avatar--sm {
+  width: 32px;
+  height: 32px;
+}
+.beneficiary-avatar--md {
+  width: 48px;
+  height: 48px;
 }
 </style>

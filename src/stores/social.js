@@ -5,6 +5,6 @@ export const useSocialStore = defineStore('social', {
   actions: {
     async fetchFeed() {},
     async fetchMessages() {},
-    async fetchConnections() {}
-  }
+    async fetchConnections() {},
+  },
 })

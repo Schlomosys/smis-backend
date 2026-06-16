@@ -23,7 +23,10 @@
           {{ supportType.name }}
         </h4>
         <div class="d-flex gap-2">
-          <router-link :to="`/admin/support-types/${supportType.id}/edit`" class="btn btn-outline-primary btn-sm">
+          <router-link
+            :to="`/admin/support-types/${supportType.id}/edit`"
+            class="btn btn-outline-primary btn-sm"
+          >
             <i class="bi bi-pencil me-1"></i>
             Modifier
           </router-link>
@@ -44,9 +47,7 @@
       </div>
     </div>
 
-    <div v-else class="alert alert-warning" role="alert">
-      Type d'appui introuvable.
-    </div>
+    <div v-else class="alert alert-warning" role="alert">Type d'appui introuvable.</div>
   </div>
 </template>
 

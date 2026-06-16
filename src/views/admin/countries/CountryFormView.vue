@@ -4,13 +4,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/countries" class="text-decoration-none">
-            Pays
-          </router-link>
+          <router-link to="/admin/countries" class="text-decoration-none"> Pays </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          {{ isEditing ? 'Modifier' : 'Nouveau' }} pays
-        </li>
+        <li class="breadcrumb-item active">{{ isEditing ? 'Modifier' : 'Nouveau' }} pays</li>
       </ol>
     </nav>
 
@@ -28,7 +24,9 @@
           <form @submit.prevent="handleSubmit">
             <div class="card-body">
               <div class="mb-3">
-                <label for="name" class="form-label">Nom du pays <span class="text-danger">*</span></label>
+                <label for="name" class="form-label"
+                  >Nom du pays <span class="text-danger">*</span></label
+                >
                 <input
                   id="name"
                   v-model="form.name"
@@ -44,11 +42,7 @@
               </div>
             </div>
             <div class="card-footer">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                :disabled="countryStore.saving"
-              >
+              <button type="submit" class="btn btn-primary" :disabled="countryStore.saving">
                 <span
                   v-if="countryStore.saving"
                   class="spinner-border spinner-border-sm me-2"
@@ -99,7 +93,7 @@ export default defineComponent({
   computed: {
     isEditing() {
       return !!this.route.params.id
-    }
+    },
   },
   async mounted() {
     if (this.isEditing) {

@@ -11,19 +11,19 @@ export const useCountryStore = defineStore('countries', {
       current_page: 1,
       last_page: 1,
       per_page: 15,
-      total: 0
+      total: 0,
     },
     filters: {
       search: '',
       sort_by: 'name',
-      sort_direction: 'asc'
+      sort_direction: 'asc',
     },
-    error: null
+    error: null,
   }),
 
   getters: {
     getById: (state) => (id) => {
-      return state.items.find(item => item.id === id) || null
+      return state.items.find((item) => item.id === id) || null
     },
 
     filteredItems: (state) => {
@@ -32,9 +32,7 @@ export const useCountryStore = defineStore('countries', {
       // Apply search filter
       if (state.filters.search) {
         const search = state.filters.search.toLowerCase()
-        items = items.filter(item =>
-          item.name.toLowerCase().includes(search)
-        )
+        items = items.filter((item) => item.name.toLowerCase().includes(search))
       }
 
       // Apply sorting
@@ -52,7 +50,7 @@ export const useCountryStore = defineStore('countries', {
       return items
     },
 
-    totalCountries: (state) => state.items.length
+    totalCountries: (state) => state.items.length,
   },
 
   actions: {
@@ -66,7 +64,7 @@ export const useCountryStore = defineStore('countries', {
           page: this.pagination.current_page,
           per_page: this.pagination.per_page,
           ...this.filters,
-          ...params
+          ...params,
         })
 
         this.items = response.data
@@ -74,7 +72,7 @@ export const useCountryStore = defineStore('countries', {
           current_page: response.current_page,
           last_page: response.last_page,
           per_page: response.per_page,
-          total: response.total
+          total: response.total,
         }
       } catch (error) {
         console.error('Error fetching countries:', error)
@@ -95,7 +93,7 @@ export const useCountryStore = defineStore('countries', {
         this.current = data
 
         // Update item in list if exists
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = this.current
         }
@@ -136,7 +134,7 @@ export const useCountryStore = defineStore('countries', {
         const updatedItem = await countryService.update(id, data)
 
         // Update in list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = updatedItem
         }
@@ -165,7 +163,7 @@ export const useCountryStore = defineStore('countries', {
         await countryService.delete(id)
 
         // Remove from list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items.splice(index, 1)
           this.pagination.total--
@@ -194,6 +192,6 @@ export const useCountryStore = defineStore('countries', {
     // Reset pagination
     resetPagination() {
       this.pagination.current_page = 1
-    }
-  }
+    },
+  },
 })

@@ -2,47 +2,67 @@
   <section class="tab-panel">
     <div class="tab-header">
       <div>
-        <h2 class="tab-title">Sponsorships</h2>
-        <p class="tab-copy">View sponsor engagements and attach new sponsorship entries to the beneficiary.</p>
+        <h2 class="tab-title">Parrainages</h2>
+        <p class="tab-copy">
+          Consultez les engagements des parrains et associez de nouveaux parrainages au
+          bénéficiaire.
+        </p>
       </div>
 
-      <button type="button" class="primary-button" @click="openModal">
-        Add Sponsorship
-      </button>
+      <button type="button" class="primary-button" @click="openModal">Ajouter un parrainage</button>
     </div>
 
     <div v-if="loading" class="state-card">
       <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-      <span>Loading sponsorships...</span>
+      <span>Chargement des parrainages...</span>
     </div>
 
-    <div v-else-if="sponsorships.length === 0" class="empty-card">
-      No data
-    </div>
+    <div v-else-if="sponsorships.length === 0" class="empty-card">Aucun parrainage enregistré</div>
 
     <div v-else class="list-grid">
-      <article v-for="item in sponsorships" :key="item.id || `${item.sponsor_id}-${item.start_date}`" class="list-card">
+      <article
+        v-for="item in sponsorships"
+        :key="item.id || `${item.sponsor_id}-${item.start_date}`"
+        class="list-card"
+      >
         <div class="list-card__row">
-          <span class="meta-label">Sponsor</span>
+          <span class="meta-label">Parrain</span>
           <strong>{{ getSponsorName(item) }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Status</span>
-          <strong>{{ item.status || '-' }}</strong>
+          <span class="meta-label">Statut</span>
+          <strong>
+            {{
+              item.status === 'active'
+                ? 'Actif'
+                : item.status === 'paused'
+                  ? 'En pause'
+                  : item.status === 'ended'
+                    ? 'Terminé'
+                    : item.status || '-'
+            }}
+          </strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Start date</span>
+          <span class="meta-label">Date de début</span>
           <strong>{{ formatDate(item.start_date) }}</strong>
         </div>
       </article>
     </div>
 
-    <app-modal v-if="showModal" title="Add Sponsorship" size="lg" centered @close="closeModal">
+    <app-modal
+      v-if="showModal"
+      title="Ajouter un parrainage"
+      size="lg"
+      centered
+      @close="closeModal"
+    >
       <div class="form-shell">
         <div class="form-hero">
-          <h3 class="form-hero__title">New Sponsorship</h3>
+          <h3 class="form-hero__title">Nouveau parrainage</h3>
           <p class="form-hero__copy">
-            Capture sponsor, start date, amount, duration, and any helpful notes.
+            Renseignez le parrain, la date de début, le montant annuel, la durée et les notes
+            éventuelles.
           </p>
         </div>
 
@@ -52,47 +72,57 @@
 
         <form class="sponsorship-form" @submit.prevent="submitSponsorship">
           <div class="field-group">
-            <label class="field-label" for="sponsor_id">Sponsor</label>
+            <label class="field-label" for="sponsor_id">Parrain</label>
             <select id="sponsor_id" v-model="form.sponsor_id" class="field-input">
-              <option value="">Select sponsor</option>
+              <option value="">Sélectionner un parrain</option>
               <option v-for="option in sponsorOptions" :key="option.id" :value="String(option.id)">
-                {{ option.name || option.full_name || `Sponsor #${option.id}` }}
+                {{ option.name || option.full_name || `Parrain #${option.id}` }}
               </option>
             </select>
             <p v-if="errors.sponsor_id" class="field-error">{{ errors.sponsor_id }}</p>
           </div>
 
           <div class="field-group">
-            <label class="field-label" for="status">Status</label>
+            <label class="field-label" for="status">Statut</label>
             <select id="status" v-model="form.status" class="field-input">
-              <option value="">Select status</option>
-              <option v-for="option in statusOptions" :key="option" :value="option">{{ option }}</option>
+              <option value="">Sélectionner le statut</option>
+              <option v-for="option in statusOptions" :key="option" :value="option">
+                {{
+                  option === 'active'
+                    ? 'Actif'
+                    : option === 'paused'
+                      ? 'En pause'
+                      : option === 'ended'
+                        ? 'Terminé'
+                        : option
+                }}
+              </option>
             </select>
             <p v-if="errors.status" class="field-error">{{ errors.status }}</p>
           </div>
 
           <div class="field-group">
-            <label class="field-label" for="start_date">Start date</label>
+            <label class="field-label" for="start_date">Date de début</label>
             <input id="start_date" v-model="form.start_date" type="date" class="field-input" />
             <p v-if="errors.start_date" class="field-error">{{ errors.start_date }}</p>
           </div>
 
           <div class="field-group field-group--accent">
-            <label class="field-label" for="annual_amount">Annual amount</label>
+            <label class="field-label" for="annual_amount">Montant annuel (FCFA)</label>
             <input
               id="annual_amount"
               v-model="form.annual_amount"
               type="number"
               min="0"
               step="0.01"
-              placeholder="0.00"
+              placeholder="0"
               class="field-input"
             />
             <p v-if="errors.annual_amount" class="field-error">{{ errors.annual_amount }}</p>
           </div>
 
           <div class="field-group field-group--accent">
-            <label class="field-label" for="duration_months">Duration (months)</label>
+            <label class="field-label" for="duration_months">Durée (mois)</label>
             <input
               id="duration_months"
               v-model="form.duration_months"
@@ -111,7 +141,7 @@
               id="notes"
               v-model="form.notes"
               rows="4"
-              placeholder="Add any relevant sponsorship context or follow-up notes..."
+              placeholder="Ajouter des notes ou remarques particulières..."
               class="field-input field-input--textarea"
             ></textarea>
             <p v-if="errors.notes" class="field-error">{{ errors.notes }}</p>
@@ -120,10 +150,12 @@
       </div>
 
       <template #footer>
-        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">Cancel</button>
+        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">
+          Annuler
+        </button>
         <button type="button" class="primary-button" :disabled="saving" @click="submitSponsorship">
           <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
-          Save sponsorship
+          Enregistrer
         </button>
       </template>
     </app-modal>
@@ -209,7 +241,10 @@ async function loadSponsorships() {
     const response = await beneficiaryService.getSponsorships(props.beneficiaryId)
     sponsorships.value = normalizeCollection(response)
   } catch (error) {
-    showToast({ type: 'error', message: error.response?.data?.message || 'Unable to load sponsorships.' })
+    showToast({
+      type: 'error',
+      message: error.response?.data?.message || 'Impossible de charger les parrainages.',
+    })
   } finally {
     loading.value = false
   }
@@ -241,31 +276,35 @@ function closeModal() {
 }
 
 function validate() {
-  errors.sponsor_id = form.sponsor_id ? '' : 'Sponsor is required.'
-  errors.start_date = form.start_date ? '' : 'Start date is required.'
-  errors.status = form.status.trim() ? '' : 'Status is required.'
+  errors.sponsor_id = form.sponsor_id ? '' : 'Le parrain est requis.'
+  errors.start_date = form.start_date ? '' : 'La date de début est requise.'
+  errors.status = form.status.trim() ? '' : 'Le statut est requis.'
   errors.annual_amount = ''
   errors.duration_months = ''
 
   if (form.annual_amount !== '' && Number(form.annual_amount) < 0) {
-    errors.annual_amount = 'Annual amount must be 0 or greater.'
+    errors.annual_amount = 'Le montant annuel doit être supérieur ou égal à 0.'
   }
 
   if (form.duration_months !== '' && Number(form.duration_months) < 0) {
-    errors.duration_months = 'Duration must be 0 or greater.'
+    errors.duration_months = 'La durée doit être supérieure ou égale à 0.'
   }
 
-  return !errors.sponsor_id
-    && !errors.start_date
-    && !errors.status
-    && !errors.annual_amount
-    && !errors.duration_months
+  return (
+    !errors.sponsor_id &&
+    !errors.start_date &&
+    !errors.status &&
+    !errors.annual_amount &&
+    !errors.duration_months
+  )
 }
 
 function getSponsorName(item) {
-  return item.sponsor?.name
-    || sponsorOptions.value.find((option) => String(option.id) === String(item.sponsor_id))?.name
-    || `Sponsor #${item.sponsor_id || 'N/A'}`
+  return (
+    item.sponsor?.name ||
+    sponsorOptions.value.find((option) => String(option.id) === String(item.sponsor_id))?.name ||
+    `Parrain #${item.sponsor_id || 'N/A'}`
+  )
 }
 
 function formatDate(value) {
@@ -289,7 +328,7 @@ async function submitSponsorship() {
       notes: form.notes.trim() || null,
     })
 
-    showToast({ type: 'success', message: 'Sponsorship added successfully.' })
+    showToast({ type: 'success', message: 'Parrainage enregistré avec succès.' })
     closeModal()
     await loadSponsorships()
     emit('updated')
@@ -302,12 +341,15 @@ async function submitSponsorship() {
       errors.annual_amount = validationErrors.annual_amount?.[0] || errors.annual_amount
       errors.duration_months = validationErrors.duration_months?.[0] || errors.duration_months
       errors.notes = validationErrors.notes?.[0] || errors.notes
-      formError.value = 'Please correct the sponsorship form.'
+      formError.value = 'Veuillez corriger le formulaire de parrainage.'
     } else {
-      formError.value = error.response?.data?.message || 'Unable to save sponsorship.'
+      formError.value = error.response?.data?.message || "Impossible d'enregistrer le parrainage."
     }
 
-    showToast({ type: 'error', message: formError.value || 'Unable to save sponsorship.' })
+    showToast({
+      type: 'error',
+      message: formError.value || "Impossible d'enregistrer le parrainage.",
+    })
   } finally {
     saving.value = false
   }
@@ -459,7 +501,10 @@ async function submitSponsorship() {
   padding: 0.9rem 1rem;
   background: #fff;
   color: #0f172a;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .field-input:focus {

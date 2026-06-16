@@ -8,9 +8,7 @@
             Communes
           </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          {{ isEditing ? 'Modifier' : 'Nouvelle' }} commune
-        </li>
+        <li class="breadcrumb-item active">{{ isEditing ? 'Modifier' : 'Nouvelle' }} commune</li>
       </ol>
     </nav>
 
@@ -73,21 +71,21 @@ export default defineComponent({
 
     return {
       router,
-      route
+      route,
     }
   },
   data() {
     return {
       form: {
         name: '',
-        region_id: ''
-      }
+        region_id: '',
+      },
     }
   },
   computed: {
     isEditing() {
       return !!this.route.params.id
-    }
+    },
   },
   async mounted() {
     if (this.isEditing) {
@@ -107,7 +105,7 @@ export default defineComponent({
       } catch (error) {
         console.error('Error saving municipality:', error)
       }
-    }
-  }
+    },
+  },
 })
 </script>

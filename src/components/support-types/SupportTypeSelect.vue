@@ -81,9 +81,7 @@ const internalValue = computed(() => {
     return props.modelValue?.id ? String(props.modelValue.id) : ''
   }
 
-  return props.modelValue === null || props.modelValue === undefined
-    ? ''
-    : String(props.modelValue)
+  return props.modelValue === null || props.modelValue === undefined ? '' : String(props.modelValue)
 })
 
 const errorMessage = computed(() => props.error || supportTypeStore.dropdownError || '')
@@ -105,7 +103,8 @@ onMounted(async () => {
 
 function handleUpdate(value) {
   if (props.returnObject) {
-    const selected = supportTypeStore.dropdownItems.find((item) => String(item.id) === String(value)) || null
+    const selected =
+      supportTypeStore.dropdownItems.find((item) => String(item.id) === String(value)) || null
     emit('update:modelValue', selected)
     return
   }

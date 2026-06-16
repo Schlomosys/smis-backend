@@ -49,7 +49,10 @@
           </div>
 
           <!-- Reset Button -->
-          <div v-if="filters.search || filters.country_id" class="col-12 col-lg-auto d-flex align-items-end">
+          <div
+            v-if="filters.search || filters.country_id"
+            class="col-12 col-lg-auto d-flex align-items-end"
+          >
             <button class="btn btn-outline-secondary btn-sm w-100" @click="handleResetFilters">
               <i class="bi bi-arrow-clockwise"></i>
               Réinitialiser
@@ -89,37 +92,37 @@
         @row-click="handleRowClick"
       >
         <!-- Name -->
-        <template #name="{ row }">
+        <template #cell-name="{ row }">
           <strong>{{ row.name }}</strong>
         </template>
 
         <!-- Country -->
-        <template #country="{ row }">
-          <span v-if="row.country" class="badge bg-light text-dark">
+        <template #cell-country="{ row }">
+          <span v-if="row.country?.name" class="badge bg-light text-dark">
             {{ row.country.name }}
           </span>
           <span v-else class="text-muted">-</span>
         </template>
 
         <!-- Actions -->
-        <template #actions="{ row }">
-          <div class="btn-group btn-group-sm">
-            <!-- Edit Button -->
-            <router-link
-              :to="`/admin/regions/${row.id}/edit`"
-              class="btn btn-outline-warning"
+        <template #cell-actions="{ row: item }">
+          <div class="action-row">
+            <button
+              type="button"
+              class="icon-action icon-action--secondary"
+              @click.stop="editItem(item)"
               title="Modifier"
             >
-              <i class="bi bi-pencil"></i>
-            </router-link>
+              Modifier
+            </button>
 
-            <!-- Delete Button -->
             <button
-              class="btn btn-outline-danger"
+              type="button"
+              class="icon-action icon-action--danger"
+              @click.stop="deleteItem(item)"
               title="Supprimer"
-              @click.stop="handleDeleteClick(row)"
             >
-              <i class="bi bi-trash"></i>
+              Supprimer
             </button>
           </div>
         </template>
@@ -166,9 +169,7 @@
               <strong>{{ selectedRegion?.name }}</strong>
               ?
             </p>
-            <p class="text-muted small">
-              Cette action est irréversible.
-            </p>
+            <p class="text-muted small">Cette action est irréversible.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -178,10 +179,7 @@
               :disabled="regionStore.saving"
               @click="handleConfirmDelete"
             >
-              <span
-                v-if="regionStore.saving"
-                class="spinner-border spinner-border-sm me-2"
-              ></span>
+              <span v-if="regionStore.saving" class="spinner-border spinner-border-sm me-2"></span>
               Supprimer
             </button>
           </div>
@@ -287,6 +285,14 @@ export default defineComponent({
       this.fetchRegions()
     },
 
+    editItem(item) {
+      this.router.push(`/admin/regions/${item.id}/edit`)
+    },
+
+    deleteItem(item) {
+      this.handleDeleteClick(item)
+    },
+
     handleRowClick(row) {
       this.router.push(`/admin/regions/${row.id}/edit`)
     },
@@ -342,3 +348,36 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.icon-action {
+  border: 0;
+  border-radius: 999px;
+  background: #ff6900;
+  color: #ffffff;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.icon-action:hover {
+  transform: translateY(-1px);
+}
+
+.icon-action--secondary {
+  background: #045480;
+}
+
+.icon-action--danger {
+  background: #fff1e8;
+  color: #cc5200;
+}
+</style>

@@ -49,7 +49,8 @@ export const useCommuneStore = defineStore('communes', {
         return this.referenceData.regions
       } catch (error) {
         console.error('Error loading regions:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement des regions'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement des regions'
         throw error
       } finally {
         this.loadingReferenceData = false
@@ -79,7 +80,8 @@ export const useCommuneStore = defineStore('communes', {
         return this.items
       } catch (error) {
         console.error('Error fetching communes:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement des communes'
+        this.error =
+          error.response?.data?.message || error.message || 'Erreur lors du chargement des communes'
         throw error
       } finally {
         this.loading = false
@@ -102,7 +104,10 @@ export const useCommuneStore = defineStore('communes', {
         return data
       } catch (error) {
         console.error('Error fetching commune:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors du chargement de la commune'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors du chargement de la commune'
         throw error
       } finally {
         this.loading = false
@@ -118,7 +123,10 @@ export const useCommuneStore = defineStore('communes', {
         return created
       } catch (error) {
         console.error('Error creating commune:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la creation de la commune'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la creation de la commune'
         throw error
       } finally {
         this.saving = false
@@ -144,7 +152,10 @@ export const useCommuneStore = defineStore('communes', {
         return updated
       } catch (error) {
         console.error('Error updating commune:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la mise a jour de la commune'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la mise a jour de la commune'
         throw error
       } finally {
         this.saving = false
@@ -168,7 +179,10 @@ export const useCommuneStore = defineStore('communes', {
         }
       } catch (error) {
         console.error('Error deleting commune:', error)
-        this.error = error.response?.data?.message || error.message || 'Erreur lors de la suppression de la commune'
+        this.error =
+          error.response?.data?.message ||
+          error.message ||
+          'Erreur lors de la suppression de la commune'
         throw error
       } finally {
         this.saving = false

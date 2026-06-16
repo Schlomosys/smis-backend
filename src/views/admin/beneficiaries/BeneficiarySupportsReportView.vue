@@ -3,29 +3,40 @@
     <div class="page-shell">
       <div class="page-header">
         <div>
-          <p class="eyebrow">Support Report</p>
+          <p class="eyebrow">Rapport des appuis</p>
           <h1 class="page-title">{{ beneficiaryName }}</h1>
           <p class="page-copy">
-            Review every support record linked to this beneficiary and export the dataset as PDF or Excel.
+            Consultez tous les appuis accordés à ce bénéficiaire et exportez ces données sous format
+            Excel ou PDF.
           </p>
         </div>
 
         <div class="header-actions">
           <router-link :to="`/admin/beneficiaries/${route.params.id}`" class="ghost-button">
-            Back to beneficiary
+            Retour au bénéficiaire
           </router-link>
-          <button type="button" class="ghost-button" :disabled="loading || supports.length === 0" @click="exportExcel">
-            Export Excel
+          <button
+            type="button"
+            class="ghost-button"
+            :disabled="loading || supports.length === 0"
+            @click="exportExcel"
+          >
+            Exporter Excel
           </button>
-          <button type="button" class="primary-button" :disabled="loading || supports.length === 0" @click="exportPdf">
-            Export PDF
+          <button
+            type="button"
+            class="primary-button"
+            :disabled="loading || supports.length === 0"
+            @click="exportPdf"
+          >
+            Exporter PDF
           </button>
         </div>
       </div>
 
       <div v-if="loading" class="state-card">
         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-        <span>Loading beneficiary support details...</span>
+        <span>Chargement des détails des appuis du bénéficiaire...</span>
       </div>
 
       <div v-else-if="loadError" class="error-card">
@@ -33,18 +44,18 @@
       </div>
 
       <div v-else-if="supports.length === 0" class="empty-card">
-        No support records found for this beneficiary.
+        Aucun appui enregistré pour ce bénéficiaire.
       </div>
 
       <div v-else class="report-card">
         <div class="report-summary">
           <div class="summary-item">
-            <span class="summary-label">Support records</span>
+            <span class="summary-label">Appuis enregistrés</span>
             <strong>{{ supports.length }}</strong>
           </div>
           <div class="summary-item">
-            <span class="summary-label">Total amount</span>
-            <strong>{{ formatAmount(totalAmount) }}</strong>
+            <span class="summary-label">Montant total</span>
+            <strong>{{ formatAmount(totalAmount) }} FCFA</strong>
           </div>
         </div>
 
@@ -52,12 +63,12 @@
           <table class="supports-table">
             <thead>
               <tr>
-                <th>Year</th>
-                <th>Amount</th>
-                <th>Support type</th>
-                <th>Frequency</th>
-                <th>Sponsor</th>
-                <th>Sponsorship</th>
+                <th>Année</th>
+                <th>Montant</th>
+                <th>Type d'appui</th>
+                <th>Fréquence</th>
+                <th>Parrain</th>
+                <th>Parrainage</th>
                 <th>Notes</th>
               </tr>
             </thead>
@@ -66,7 +77,17 @@
                 <td>{{ item.year || '-' }}</td>
                 <td>{{ formatAmount(item.amount) }}</td>
                 <td>{{ getSupportTypeName(item) }}</td>
-                <td>{{ item.frequency || '-' }}</td>
+                <td>
+                  {{
+                    item.frequency === 'ponctuel'
+                      ? 'Ponctuel'
+                      : item.frequency === 'mensuel'
+                        ? 'Mensuel'
+                        : item.frequency === 'annuel'
+                          ? 'Annuel'
+                          : item.frequency || '-'
+                  }}
+                </td>
                 <td>{{ getSponsorName(item) }}</td>
                 <td>{{ getSponsorshipLabel(item) }}</td>
                 <td>{{ item.notes || '-' }}</td>
@@ -96,7 +117,9 @@ const referenceData = ref({})
 
 const beneficiaryName = computed(() => {
   const parts = [beneficiary.value?.first_name, beneficiary.value?.last_name].filter(Boolean)
-  return parts.length ? `${parts.join(' ')} Support Details` : 'Beneficiary Support Details'
+  return parts.length
+    ? `Détails des appuis de ${parts.join(' ')}`
+    : 'Détails des appuis du bénéficiaire'
 })
 
 const supportTypes = computed(() =>
@@ -132,11 +155,14 @@ async function loadPage() {
       beneficiaryService.getReferenceData(),
     ])
 
-    beneficiary.value = beneficiaryResponse?.beneficiary || beneficiaryResponse?.data || beneficiaryResponse
+    beneficiary.value =
+      beneficiaryResponse?.beneficiary || beneficiaryResponse?.data || beneficiaryResponse
     supports.value = normalizeCollection(supportsResponse)
     referenceData.value = referenceResponse || {}
   } catch (error) {
-    loadError.value = error.response?.data?.message || 'Unable to load beneficiary support details.'
+    loadError.value =
+      error.response?.data?.message ||
+      'Impossible de charger les détails des appuis du bénéficiaire.'
     showToast({ type: 'error', message: loadError.value })
   } finally {
     loading.value = false
@@ -144,16 +170,20 @@ async function loadPage() {
 }
 
 function getSupportTypeName(item) {
-  return item.supportType?.name
-    || item.support_type?.name
-    || supportTypes.value.find((option) => String(option.id) === String(item.support_type_id))?.name
-    || `Support type #${item.support_type_id || 'N/A'}`
+  return (
+    item.supportType?.name ||
+    item.support_type?.name ||
+    supportTypes.value.find((option) => String(option.id) === String(item.support_type_id))?.name ||
+    `Type d'appui #${item.support_type_id || 'N/A'}`
+  )
 }
 
 function getRelatedSponsorship(item) {
-  return item.sponsorship
-    || sponsorships.value.find((option) => String(option.id) === String(item.sponsorship_id))
-    || null
+  return (
+    item.sponsorship ||
+    sponsorships.value.find((option) => String(option.id) === String(item.sponsorship_id)) ||
+    null
+  )
 }
 
 function getSponsorName(item) {
@@ -165,8 +195,14 @@ function getSponsorshipLabel(item) {
   const sponsorship = getRelatedSponsorship(item)
   if (!sponsorship) return '-'
 
-  const sponsorName = sponsorship?.sponsor?.name || sponsorship?.sponsor_name || sponsorship?.name || `#${sponsorship.id}`
-  const startDate = sponsorship.start_date ? ` (${String(sponsorship.start_date).slice(0, 10)})` : ''
+  const sponsorName =
+    sponsorship?.sponsor?.name ||
+    sponsorship?.sponsor_name ||
+    sponsorship?.name ||
+    `#${sponsorship.id}`
+  const startDate = sponsorship.start_date
+    ? ` (${String(sponsorship.start_date).slice(0, 10)})`
+    : ''
   return `${sponsorName}${startDate}`
 }
 
@@ -180,12 +216,19 @@ function formatAmount(value) {
 
 function buildExportRows() {
   return supports.value.map((item) => ({
-    Year: item.year || '-',
-    Amount: formatAmount(item.amount),
-    SupportType: getSupportTypeName(item),
-    Frequency: item.frequency || '-',
-    Sponsor: getSponsorName(item),
-    Sponsorship: getSponsorshipLabel(item),
+    Année: item.year || '-',
+    Montant: formatAmount(item.amount),
+    "Type d'appui": getSupportTypeName(item),
+    Fréquence:
+      item.frequency === 'ponctuel'
+        ? 'Ponctuel'
+        : item.frequency === 'mensuel'
+          ? 'Mensuel'
+          : item.frequency === 'annuel'
+            ? 'Annuel'
+            : item.frequency || '-',
+    Parrain: getSponsorName(item),
+    Parrainage: getSponsorshipLabel(item),
     Notes: item.notes || '-',
   }))
 }
@@ -229,9 +272,9 @@ function exportExcel() {
     </html>
   `
 
-  const filename = `beneficiary-supports-${route.params.id}.xls`
+  const filename = `appuis-beneficiaire-${route.params.id}.xls`
   downloadBlob(excelHtml, filename, 'application/vnd.ms-excel;charset=utf-8;')
-  showToast({ type: 'success', message: 'Excel export generated successfully.' })
+  showToast({ type: 'success', message: 'Export Excel généré avec succès.' })
 }
 
 function exportPdf() {
@@ -240,20 +283,20 @@ function exportPdf() {
     .map(
       (row) => `
         <tr>
-          <td>${row.Year}</td>
-          <td>${row.Amount}</td>
-          <td>${row.SupportType}</td>
-          <td>${row.Frequency}</td>
-          <td>${row.Sponsor}</td>
-          <td>${row.Sponsorship}</td>
-          <td>${row.Notes}</td>
+          <td>${row['Année']}</td>
+          <td>${row['Montant']}</td>
+          <td>${row["Type d'appui"]}</td>
+          <td>${row['Fréquence']}</td>
+          <td>${row['Parrain']}</td>
+          <td>${row['Parrainage']}</td>
+          <td>${row['Notes']}</td>
         </tr>`,
     )
     .join('')
 
   const popup = window.open('', '_blank', 'width=1200,height=800')
   if (!popup) {
-    showToast({ type: 'error', message: 'Please allow popups to export PDF.' })
+    showToast({ type: 'error', message: 'Veuillez autoriser les popups pour exporter en PDF.' })
     return
   }
 
@@ -272,16 +315,16 @@ function exportPdf() {
       </head>
       <body>
         <h1>${beneficiaryName.value}</h1>
-        <p>Generated on ${new Date().toLocaleDateString()}</p>
+        <p>Généré le ${new Date().toLocaleDateString()}</p>
         <table>
           <thead>
             <tr>
-              <th>Year</th>
-              <th>Amount</th>
-              <th>Support type</th>
-              <th>Frequency</th>
-              <th>Sponsor</th>
-              <th>Sponsorship</th>
+              <th>Année</th>
+              <th>Montant</th>
+              <th>Type d'appui</th>
+              <th>Fréquence</th>
+              <th>Parrain</th>
+              <th>Parrainage</th>
               <th>Notes</th>
             </tr>
           </thead>
@@ -293,7 +336,7 @@ function exportPdf() {
   popup.document.close()
   popup.focus()
   popup.print()
-  showToast({ type: 'success', message: 'PDF export window opened successfully.' })
+  showToast({ type: 'success', message: "Fenêtre d'exportation PDF ouverte avec succès." })
 }
 </script>
 

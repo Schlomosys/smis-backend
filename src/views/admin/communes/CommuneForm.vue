@@ -3,19 +3,19 @@
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <router-link to="/admin/communes" class="text-decoration-none">
-            Communes
-          </router-link>
+          <router-link to="/admin/communes" class="text-decoration-none"> Communes </router-link>
         </li>
-        <li class="breadcrumb-item active">
-          {{ isEditing ? 'Modifier' : 'Nouvelle' }} commune
-        </li>
+        <li class="breadcrumb-item active">{{ isEditing ? 'Modifier' : 'Nouvelle' }} commune</li>
       </ol>
     </nav>
 
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div v-if="communeStore.error && !communeStore.loading" class="alert alert-danger" role="alert">
+        <div
+          v-if="communeStore.error && !communeStore.loading"
+          class="alert alert-danger"
+          role="alert"
+        >
           {{ communeStore.error }}
         </div>
 
@@ -47,7 +47,10 @@
                 class="btn btn-primary"
                 :disabled="communeStore.saving || initialLoading"
               >
-                <span v-if="communeStore.saving" class="spinner-border spinner-border-sm me-2"></span>
+                <span
+                  v-if="communeStore.saving"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
                 <i class="bi bi-check-lg"></i>
                 Enregistrer
               </button>

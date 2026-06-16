@@ -28,9 +28,6 @@
                 @input="applyFilters"
               />
             </div>
-            <small class="text-muted">
-              Recherche sur <strong>family_name</strong> et <strong>guardian_name</strong>
-            </small>
           </div>
 
           <div v-if="filters.search" class="col-lg-auto d-flex align-items-end">

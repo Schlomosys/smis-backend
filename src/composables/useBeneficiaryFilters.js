@@ -9,7 +9,7 @@ export function useBeneficiaryFilters() {
     risk_level: '',
     is_disabled: '',
     sort_by: 'created_at',
-    sort_direction: 'desc'
+    sort_direction: 'desc',
   })
 
   // Debounced search timer
@@ -19,29 +19,29 @@ export function useBeneficiaryFilters() {
   const filterOptions = computed(() => ({
     type: [
       { value: 'active', label: 'Actif' },
-      { value: 'alumni', label: 'Alumni' }
+      { value: 'alumni', label: 'Alumni' },
     ],
     risk_level: [
       { value: 'low', label: 'Faible' },
       { value: 'medium', label: 'Moyen' },
-      { value: 'high', label: 'Élevé' }
+      { value: 'high', label: 'Élevé' },
     ],
     is_disabled: [
       { value: 'false', label: 'Non handicapé' },
-      { value: 'true', label: 'Handicapé' }
+      { value: 'true', label: 'Handicapé' },
     ],
     sort_by: [
       { value: 'created_at', label: 'Date de création' },
       { value: 'first_name', label: 'Prénom' },
       { value: 'last_name', label: 'Nom' },
       { value: 'unique_code', label: 'Code unique' },
-      { value: 'entry_date', label: 'Date d\'entrée' },
-      { value: 'global_score', label: 'Score global' }
+      { value: 'entry_date', label: "Date d'entrée" },
+      { value: 'global_score', label: 'Score global' },
     ],
     sort_direction: [
       { value: 'asc', label: 'Croissant' },
-      { value: 'desc', label: 'Décroissant' }
-    ]
+      { value: 'desc', label: 'Décroissant' },
+    ],
   }))
 
   // Active filters count
@@ -145,6 +145,6 @@ export function useBeneficiaryFilters() {
     toggleSortDirection,
     setSorting,
     getSortIcon,
-    isSortedBy
+    isSortedBy,
   }
 }

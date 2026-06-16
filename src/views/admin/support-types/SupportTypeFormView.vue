@@ -16,9 +16,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-body text-center py-5">
         <h1 class="h4 mb-2">{{ isEditing ? 'Modification' : 'Creation' }} d'un type d'appui</h1>
-        <p class="text-muted mb-0">
-          Le formulaire s'ouvre dans une fenetre modale reutilisable.
-        </p>
+        <p class="text-muted mb-0">Le formulaire s'ouvre dans une fenetre modale reutilisable.</p>
       </div>
     </div>
 
@@ -98,7 +96,9 @@ async function handleSave({ id, payload }) {
     }
 
     formError.value =
-      error.response?.data?.message || error.message || "Erreur lors de la sauvegarde du type d'appui"
+      error.response?.data?.message ||
+      error.message ||
+      "Erreur lors de la sauvegarde du type d'appui"
   }
 }
 </script>

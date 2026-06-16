@@ -13,7 +13,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
       supportTypes: [],
       sponsors: [],
       families: [],
-      vulnerabilityTypes: []
+      vulnerabilityTypes: [],
     },
     loading: false,
     saving: false,
@@ -21,7 +21,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
       current_page: 1,
       last_page: 1,
       per_page: 15,
-      total: 0
+      total: 0,
     },
     filters: {
       search: '',
@@ -30,15 +30,15 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
       risk_level: '',
       is_disabled: '',
       sort_by: 'created_at',
-      sort_direction: 'desc'
+      sort_direction: 'desc',
     },
     statistics: null,
-    error: null
+    error: null,
   }),
 
   getters: {
     getById: (state) => (id) => {
-      return state.items.find(item => item.id === id) || null
+      return state.items.find((item) => item.id === id) || null
     },
 
     filteredItems: (state) => {
@@ -47,34 +47,62 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
       // Apply filters
       if (state.filters.search) {
         const search = state.filters.search.toLowerCase()
-        items = items.filter(item =>
-          item.first_name.toLowerCase().includes(search) ||
-          item.last_name.toLowerCase().includes(search) ||
-          item.unique_code.toLowerCase().includes(search)
+        items = items.filter(
+          (item) =>
+            item.first_name?.toLowerCase().includes(search) ||
+            item.last_name?.toLowerCase().includes(search) ||
+            item.unique_code?.toLowerCase().includes(search),
         )
       }
 
       if (state.filters.commune_id) {
-        items = items.filter(item => item.commune_id === state.filters.commune_id)
+        items = items.filter((item) => {
+          return (
+            String(item.commune_id) === String(state.filters.commune_id) ||
+            String(item.latest_academic_record?.school?.commune?.id) ===
+              String(state.filters.commune_id)
+          )
+        })
       }
 
       if (state.filters.type) {
-        items = items.filter(item => item.type === state.filters.type)
+        items = items.filter((item) => item.type === state.filters.type)
       }
 
       if (state.filters.risk_level) {
-        items = items.filter(item => item.risk_level === state.filters.risk_level)
+        items = items.filter((item) => item.risk_level === state.filters.risk_level)
       }
 
       if (state.filters.is_disabled !== '') {
         const isDisabled = state.filters.is_disabled === 'true'
-        items = items.filter(item => item.is_disabled === isDisabled)
+        items = items.filter((item) => item.is_disabled === isDisabled)
       }
 
       // Apply sorting
       items.sort((a, b) => {
-        const aValue = a[state.filters.sort_by]
-        const bValue = b[state.filters.sort_by]
+        const resolveValue = (item) => {
+          if (!item) return ''
+          if (state.filters.sort_by === 'school') {
+            return item.latest_academic_record?.school?.name?.toLowerCase() || ''
+          }
+          if (state.filters.sort_by === 'commune') {
+            return item.latest_academic_record?.school?.commune?.name?.toLowerCase() || ''
+          }
+          if (state.filters.sort_by === 'country') {
+            return (
+              item.latest_academic_record?.school?.commune?.region?.country?.name?.toLowerCase() ||
+              ''
+            )
+          }
+          if (state.filters.sort_by === 'name' || state.filters.sort_by === 'last_name') {
+            return [item.last_name, item.first_name].filter(Boolean).join(' ').toLowerCase()
+          }
+          const val = item[state.filters.sort_by]
+          return typeof val === 'string' ? val.toLowerCase() : val || ''
+        }
+
+        const aValue = resolveValue(a)
+        const bValue = resolveValue(b)
 
         let result = 0
         if (aValue < bValue) result = -1
@@ -87,15 +115,15 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
     },
 
     activeBeneficiaries: (state) => {
-      return state.items.filter(item => item.type === 'active')
+      return state.items.filter((item) => item.type === 'active')
     },
 
     alumniBeneficiaries: (state) => {
-      return state.items.filter(item => item.type === 'alumni')
+      return state.items.filter((item) => item.type === 'alumni')
     },
 
     highRiskBeneficiaries: (state) => {
-      return state.items.filter(item => item.risk_level === 'high')
+      return state.items.filter((item) => item.risk_level === 'high')
     },
 
     totalBeneficiaries: (state) => state.items.length,
@@ -104,7 +132,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
 
     totalAlumni: (state) => state.alumniBeneficiaries.length,
 
-    totalHighRisk: (state) => state.highRiskBeneficiaries.length
+    totalHighRisk: (state) => state.highRiskBeneficiaries.length,
   },
 
   actions: {
@@ -134,15 +162,16 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
           page: this.pagination.current_page,
           per_page: this.pagination.per_page,
           ...this.filters,
-          ...params
+          ...params,
         })
+        console.log(response)
 
         this.items = response.data
         this.pagination = {
           current_page: response.current_page,
           last_page: response.last_page,
           per_page: response.per_page,
-          total: response.total
+          total: response.total,
         }
       } catch (error) {
         console.error('Error fetching beneficiaries:', error)
@@ -163,7 +192,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         this.current = data.beneficiary || data.data || data
 
         // Update item in list if exists
-        const index = this.items.findIndex(item => String(item.id) === String(id))
+        const index = this.items.findIndex((item) => String(item.id) === String(id))
         if (index !== -1) {
           this.items[index] = this.current
         }
@@ -206,7 +235,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         const updatedItem = response.beneficiary || response.data || response
 
         // Update in list
-        const index = this.items.findIndex(item => String(item.id) === String(id))
+        const index = this.items.findIndex((item) => String(item.id) === String(id))
         if (index !== -1) {
           this.items[index] = updatedItem
         }
@@ -235,7 +264,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         await beneficiaryService.delete(id)
 
         // Remove from list
-        this.items = this.items.filter(item => String(item.id) !== String(id))
+        this.items = this.items.filter((item) => String(item.id) !== String(id))
 
         // Clear current if it's the same
         if (this.current && String(this.current.id) === String(id)) {
@@ -330,7 +359,10 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
     // Documents
     async uploadDocument(formData) {
       try {
-        const document = await beneficiaryService.uploadDocument(formData.get('beneficiary_id'), formData)
+        const document = await beneficiaryService.uploadDocument(
+          formData.get('beneficiary_id'),
+          formData,
+        )
 
         if (this.current && this.current.id === formData.get('beneficiary_id')) {
           if (!this.current.documents) {
@@ -351,7 +383,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         await beneficiaryService.deleteDocument(this.current.id, documentId)
 
         if (this.current && this.current.documents) {
-          this.current.documents = this.current.documents.filter(doc => doc.id !== documentId)
+          this.current.documents = this.current.documents.filter((doc) => doc.id !== documentId)
         }
       } catch (error) {
         console.error('Error deleting document:', error)
@@ -393,7 +425,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         const result = await beneficiaryService.bulkDelete(ids)
 
         // Remove from list
-        this.items = this.items.filter(item => !ids.includes(item.id))
+        this.items = this.items.filter((item) => !ids.includes(item.id))
         this.pagination.total -= ids.length
 
         return result
@@ -425,7 +457,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         const result = await beneficiaryService.updateRiskLevel(id, riskLevel, notes)
 
         // Update in list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index].risk_level = riskLevel
         }
@@ -448,7 +480,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         const result = await beneficiaryService.updateGlobalScore(id, score, notes)
 
         // Update in list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index].global_score = score
         }
@@ -471,7 +503,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         const result = await beneficiaryService.exitBeneficiary(id, exitData)
 
         // Update in list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = result
         }
@@ -493,7 +525,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         const result = await beneficiaryService.reactivateBeneficiary(id, data)
 
         // Update in list
-        const index = this.items.findIndex(item => item.id === id)
+        const index = this.items.findIndex((item) => item.id === id)
         if (index !== -1) {
           this.items[index] = result
         }
@@ -523,7 +555,7 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
         risk_level: '',
         is_disabled: '',
         sort_by: 'created_at',
-        sort_direction: 'desc'
+        sort_direction: 'desc',
       }
     },
 
@@ -544,6 +576,6 @@ export const useBeneficiaryStore = defineStore('beneficiaries', {
 
     clearError() {
       this.error = null
-    }
-  }
+    },
+  },
 })

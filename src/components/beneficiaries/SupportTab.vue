@@ -2,29 +2,35 @@
   <section class="tab-panel">
     <div class="tab-header">
       <div>
-        <h2 class="tab-title">Supports</h2>
-        <p class="tab-copy">Track direct support received by this beneficiary and attach new entries when needed.</p>
+        <h2 class="tab-title">Appuis</h2>
+        <p class="tab-copy">
+          Suivez les appuis directs reçus par ce bénéficiaire et ajoutez de nouveaux enregistrements
+          si nécessaire.
+        </p>
       </div>
 
       <div class="header-actions">
-        <router-link :to="`/admin/beneficiaries/${beneficiaryId}/supports-report`" class="ghost-button">
-          View Support Details
+        <router-link
+          :to="`/admin/beneficiaries/${beneficiaryId}/supports-report`"
+          class="ghost-button"
+        >
+          Voir les détails des appuis
         </router-link>
-        <button type="button" class="primary-button" @click="openModal">
-          Add Support
-        </button>
+        <button type="button" class="primary-button" @click="openModal">Ajouter un appui</button>
       </div>
     </div>
 
     <div v-if="loading" class="state-card">
       <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-      <span>Loading supports...</span>
+      <span>Chargement des appuis...</span>
     </div>
 
     <div v-else-if="supports.length === 0" class="empty-card">
       <div class="empty-card__content">
-        <h3>No supports yet</h3>
-        <p>Add the first support record to start tracking beneficiary assistance.</p>
+        <h3>Aucun appui pour le moment</h3>
+        <p>
+          Ajoutez le premier enregistrement pour commencer à suivre les appuis de ce bénéficiaire.
+        </p>
       </div>
     </div>
 
@@ -33,11 +39,11 @@
         <table class="supports-table">
           <thead>
             <tr>
-              <th>Year</th>
-              <th>Amount</th>
-              <th>Support Type</th>
-              <th>Frequency</th>
-              <th>Sponsor</th>
+              <th>Année</th>
+              <th>Montant</th>
+              <th>Type d'appui</th>
+              <th>Fréquence</th>
+              <th>Parrain</th>
               <th class="actions-cell">Actions</th>
             </tr>
           </thead>
@@ -46,7 +52,17 @@
               <td>{{ item.year || '-' }}</td>
               <td>{{ formatAmount(item.amount) }}</td>
               <td>{{ getSupportTypeName(item) }}</td>
-              <td>{{ item.frequency || '-' }}</td>
+              <td>
+                {{
+                  item.frequency === 'ponctuel'
+                    ? 'Ponctuel'
+                    : item.frequency === 'mensuel'
+                      ? 'Mensuel'
+                      : item.frequency === 'annuel'
+                        ? 'Annuel'
+                        : item.frequency || '-'
+                }}
+              </td>
               <td>{{ getSponsorName(item) }}</td>
               <td class="actions-cell">
                 <button
@@ -60,7 +76,7 @@
                     class="spinner-border spinner-border-sm me-2"
                     role="status"
                   ></span>
-                  Delete
+                  Supprimer
                 </button>
               </td>
             </tr>
@@ -69,12 +85,15 @@
       </div>
     </div>
 
-    <app-modal v-if="showModal" title="Add Support" size="lg" centered @close="closeModal">
+    <app-modal v-if="showModal" title="Ajouter un appui" size="lg" centered @close="closeModal">
       <div class="space-y-6">
-        <div class="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 via-white to-teal-50 p-5">
-          <h3 class="text-lg font-semibold text-slate-900">New Support Record</h3>
+        <div
+          class="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 via-white to-teal-50 p-5"
+        >
+          <h3 class="text-lg font-semibold text-slate-900">Nouvel appui</h3>
           <p class="mt-1 text-sm text-slate-600">
-            Add structured support details including year, type, amount, frequency, and optional sponsorship.
+            Ajoutez des détails structurés pour cet appui : année, type, montant, fréquence et lien
+            éventuel avec un parrainage.
           </p>
         </div>
 
@@ -88,55 +107,90 @@
 
         <form class="grid gap-5 md:grid-cols-2" @submit.prevent="submitSupport">
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700" for="year">Year</label>
-            <input id="year" v-model="form.year" type="number" step="1" placeholder="2026" class="tailwind-input" />
+            <label class="text-sm font-medium text-slate-700" for="year">Année</label>
+            <input
+              id="year"
+              v-model="form.year"
+              type="number"
+              step="1"
+              placeholder="2026"
+              class="tailwind-input"
+            />
             <p v-if="errors.year" class="text-sm text-rose-600">{{ errors.year }}</p>
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700" for="support_type_id">Support type</label>
+            <label class="text-sm font-medium text-slate-700" for="support_type_id"
+              >Type d'appui</label
+            >
             <select id="support_type_id" v-model="form.support_type_id" class="tailwind-input">
-              <option value="">Select support type</option>
-              <option v-for="option in supportTypeOptions" :key="option.id" :value="String(option.id)">
-                {{ option.name || option.label || `Support type #${option.id}` }}
+              <option value="">Sélectionner un type d'appui</option>
+              <option
+                v-for="option in supportTypeOptions"
+                :key="option.id"
+                :value="String(option.id)"
+              >
+                {{ option.name || option.label || `Type d'appui #${option.id}` }}
               </option>
             </select>
-            <p v-if="errors.support_type_id" class="text-sm text-rose-600">{{ errors.support_type_id }}</p>
+            <p v-if="errors.support_type_id" class="text-sm text-rose-600">
+              {{ errors.support_type_id }}
+            </p>
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700" for="amount">Amount</label>
+            <label class="text-sm font-medium text-slate-700" for="amount">Montant</label>
             <input
               id="amount"
               v-model="form.amount"
               type="number"
               min="0"
               step="0.01"
-              placeholder="0.00"
+              placeholder="0"
               class="tailwind-input"
             />
             <p v-if="errors.amount" class="text-sm text-rose-600">{{ errors.amount }}</p>
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-700" for="frequency">Frequency</label>
+            <label class="text-sm font-medium text-slate-700" for="frequency">Fréquence</label>
             <select id="frequency" v-model="form.frequency" class="tailwind-input">
-              <option value="">Select frequency</option>
-              <option v-for="option in frequencyOptions" :key="option" :value="option">{{ option }}</option>
+              <option value="">Sélectionner la fréquence</option>
+              <option v-for="option in frequencyOptions" :key="option" :value="option">
+                {{
+                  option === 'ponctuel'
+                    ? 'Ponctuel'
+                    : option === 'mensuel'
+                      ? 'Mensuel'
+                      : option === 'annuel'
+                        ? 'Annuel'
+                        : option
+                }}
+              </option>
             </select>
             <p v-if="errors.frequency" class="text-sm text-rose-600">{{ errors.frequency }}</p>
           </div>
 
           <div class="space-y-2 md:col-span-2">
-            <label class="text-sm font-medium text-slate-700" for="sponsorship_id">Sponsorship</label>
+            <label class="text-sm font-medium text-slate-700" for="sponsorship_id"
+              >Parrainage lié</label
+            >
             <select id="sponsorship_id" v-model="form.sponsorship_id" class="tailwind-input">
-              <option value="">No sponsorship linked</option>
-              <option v-for="option in sponsorshipOptions" :key="option.id" :value="String(option.id)">
+              <option value="">Aucun parrainage lié</option>
+              <option
+                v-for="option in sponsorshipOptions"
+                :key="option.id"
+                :value="String(option.id)"
+              >
                 {{ getSponsorshipOptionLabel(option) }}
               </option>
             </select>
-            <p class="text-xs text-slate-500">Optional. Limited to sponsorships linked to this beneficiary.</p>
-            <p v-if="errors.sponsorship_id" class="text-sm text-rose-600">{{ errors.sponsorship_id }}</p>
+            <p class="text-xs text-slate-500">
+              Optionnel. Limité aux parrainages de ce bénéficiaire.
+            </p>
+            <p v-if="errors.sponsorship_id" class="text-sm text-rose-600">
+              {{ errors.sponsorship_id }}
+            </p>
           </div>
 
           <div class="space-y-2 md:col-span-2">
@@ -145,7 +199,7 @@
               id="notes"
               v-model="form.notes"
               rows="4"
-              placeholder="Add any context, purpose, or follow-up information..."
+              placeholder="Ajouter des détails sur le contexte ou le suivi..."
               class="tailwind-textarea"
             ></textarea>
             <p v-if="errors.notes" class="text-sm text-rose-600">{{ errors.notes }}</p>
@@ -154,39 +208,51 @@
       </div>
 
       <template #footer>
-        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">Cancel</button>
+        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">
+          Annuler
+        </button>
         <button type="button" class="primary-button" :disabled="saving" @click="submitSupport">
           <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
-          Save support
+          Enregistrer
         </button>
       </template>
     </app-modal>
 
-    <app-modal v-if="showDeleteModal" title="Delete Support" centered @close="closeDeleteModal">
+    <app-modal v-if="showDeleteModal" title="Supprimer l'appui" centered @close="closeDeleteModal">
       <div class="space-y-4">
         <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700">
-          This will permanently remove the selected support record.
+          Cette action supprimera définitivement cet enregistrement d'appui.
         </div>
         <p class="delete-copy">
-          Delete
+          Voulez-vous supprimer
           <strong>{{ getSupportTypeName(selectedSupport) }}</strong>
-          for
+          pour l'année
           <strong>{{ selectedSupport?.year || '-' }}</strong>
           ?
         </p>
       </div>
 
       <template #footer>
-        <button type="button" class="ghost-button" :disabled="deletingId === selectedSupport?.id" @click="closeDeleteModal">
-          Cancel
+        <button
+          type="button"
+          class="ghost-button"
+          :disabled="deletingId === selectedSupport?.id"
+          @click="closeDeleteModal"
+        >
+          Annuler
         </button>
-        <button type="button" class="danger-button" :disabled="deletingId === selectedSupport?.id" @click="deleteSupport">
+        <button
+          type="button"
+          class="danger-button"
+          :disabled="deletingId === selectedSupport?.id"
+          @click="deleteSupport"
+        >
           <span
             v-if="deletingId === selectedSupport?.id"
             class="spinner-border spinner-border-sm me-2"
             role="status"
           ></span>
-          Delete support
+          Supprimer l'appui
         </button>
       </template>
     </app-modal>
@@ -237,7 +303,9 @@ const errors = reactive({
   sponsorship_id: '',
 })
 
-const supportTypeOptions = computed(() => (Array.isArray(props.supportTypes) ? props.supportTypes : []))
+const supportTypeOptions = computed(() =>
+  Array.isArray(props.supportTypes) ? props.supportTypes : [],
+)
 const sponsorshipOptions = computed(() => {
   const list = Array.isArray(props.sponsorships) ? props.sponsorships : []
   return list.filter((item) => {
@@ -264,7 +332,10 @@ async function loadSupports() {
     const response = await beneficiaryService.getSupports(props.beneficiaryId)
     supports.value = normalizeCollection(response)
   } catch (error) {
-    showToast({ type: 'error', message: error.response?.data?.message || 'Unable to load supports.' })
+    showToast({
+      type: 'error',
+      message: error.response?.data?.message || 'Impossible de charger les appuis.',
+    })
   } finally {
     loading.value = false
   }
@@ -306,12 +377,12 @@ function closeDeleteModal() {
 }
 
 function validate() {
-  errors.year = form.year ? '' : 'Year is required.'
-  errors.support_type_id = form.support_type_id ? '' : 'Support type is required.'
+  errors.year = form.year ? '' : "L'année est requise."
+  errors.support_type_id = form.support_type_id ? '' : "Le type d'appui est requis."
   errors.amount = ''
 
   if (form.amount !== '' && Number(form.amount) < 0) {
-    errors.amount = 'Amount must be 0 or greater.'
+    errors.amount = 'Le montant doit être supérieur ou égal à 0.'
   }
 
   return !errors.year && !errors.support_type_id && !errors.amount
@@ -319,25 +390,27 @@ function validate() {
 
 function getSupportTypeName(item) {
   if (!item) return '-'
-  return item.supportType?.name
-    || item.support_type?.name
-    || supportTypeOptions.value.find((option) => String(option.id) === String(item.support_type_id))?.name
-    || `Support type #${item.support_type_id || 'N/A'}`
+  return (
+    item.supportType?.name ||
+    item.support_type?.name ||
+    supportTypeOptions.value.find((option) => String(option.id) === String(item.support_type_id))
+      ?.name ||
+    `Type d'appui #${item.support_type_id || 'N/A'}`
+  )
 }
 
 function getSponsorName(item) {
   if (!item) return '-'
-  const sponsorship = item.sponsorship
-    || sponsorshipOptions.value.find((option) => String(option.id) === String(item.sponsorship_id))
+  const sponsorship =
+    item.sponsorship ||
+    sponsorshipOptions.value.find((option) => String(option.id) === String(item.sponsorship_id))
 
-  return sponsorship?.sponsor?.name
-    || sponsorship?.sponsor_name
-    || sponsorship?.name
-    || '-'
+  return sponsorship?.sponsor?.name || sponsorship?.sponsor_name || sponsorship?.name || '-'
 }
 
 function getSponsorshipOptionLabel(item) {
-  const sponsorName = item.sponsor?.name || item.sponsor_name || item.name || `Sponsorship #${item.id}`
+  const sponsorName =
+    item.sponsor?.name || item.sponsor_name || item.name || `Parrainage #${item.id}`
   const year = item.start_date ? ` · ${String(item.start_date).slice(0, 10)}` : ''
   return `${sponsorName}${year}`
 }
@@ -366,7 +439,7 @@ async function submitSupport() {
       sponsorship_id: form.sponsorship_id ? Number(form.sponsorship_id) : null,
     })
 
-    showToast({ type: 'success', message: 'Support added successfully.' })
+    showToast({ type: 'success', message: 'Appui enregistré avec succès.' })
     closeModal()
     await loadSupports()
     emit('updated')
@@ -379,12 +452,12 @@ async function submitSupport() {
       errors.frequency = validationErrors.frequency?.[0] || errors.frequency
       errors.notes = validationErrors.notes?.[0] || errors.notes
       errors.sponsorship_id = validationErrors.sponsorship_id?.[0] || errors.sponsorship_id
-      formError.value = 'Please correct the support form.'
+      formError.value = "Veuillez corriger le formulaire d'appui."
     } else {
-      formError.value = error.response?.data?.message || 'Unable to save support.'
+      formError.value = error.response?.data?.message || "Impossible d'enregistrer l'appui."
     }
 
-    showToast({ type: 'error', message: formError.value || 'Unable to save support.' })
+    showToast({ type: 'error', message: formError.value || "Impossible d'enregistrer l'appui." })
   } finally {
     saving.value = false
   }
@@ -397,14 +470,14 @@ async function deleteSupport() {
 
   try {
     await beneficiaryService.deleteSupport(props.beneficiaryId, selectedSupport.value.id)
-    showToast({ type: 'success', message: 'Support deleted successfully.' })
+    showToast({ type: 'success', message: 'Appui supprimé avec succès.' })
     closeDeleteModal()
     await loadSupports()
     emit('updated')
   } catch (error) {
     showToast({
       type: 'error',
-      message: error.response?.data?.message || 'Unable to delete support.',
+      message: error.response?.data?.message || "Impossible de supprimer l'appui.",
     })
   } finally {
     deletingId.value = null

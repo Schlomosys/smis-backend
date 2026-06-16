@@ -2,94 +2,122 @@
   <section class="tab-panel">
     <div class="tab-header">
       <div>
-        <h2 class="tab-title">Academic Records</h2>
-        <p class="tab-copy">Track yearly class performance, average scores, and attendance trends.</p>
+        <h2 class="tab-title">Historique scolaire</h2>
+        <p class="tab-copy">
+          Suivez les performances annuelles, les moyennes et le taux de présence.
+        </p>
       </div>
 
-      <button type="button" class="primary-button" @click="openModal">
-        Add Record
-      </button>
+      <button type="button" class="primary-button" @click="openModal">Ajouter un historique</button>
     </div>
 
     <div v-if="loading" class="state-card">
       <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-      <span>Loading academic records...</span>
+      <span>Chargement des dossiers scolaires...</span>
     </div>
 
-    <div v-else-if="records.length === 0" class="empty-card">
-      No data
-    </div>
+    <div v-else-if="records.length === 0" class="empty-card">Aucun dossier scolaire enregistré</div>
 
     <div v-else class="list-grid">
-      <article v-for="record in records" :key="record.id || `${record.academic_year}-${record.class_name}`" class="list-card">
+      <article
+        v-for="record in records"
+        :key="record.id || `${record.academic_year}-${record.class_name}`"
+        class="list-card"
+      >
         <div class="list-card__row">
-          <span class="meta-label">Academic year</span>
+          <span class="meta-label">Année académique</span>
           <strong>{{ record.academic_year || '-' }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Class</span>
+          <span class="meta-label">Classe</span>
           <strong>{{ record.class_name || record.class || '-' }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">School</span>
+          <span class="meta-label">École</span>
           <strong>{{ record.school?.name || findSchoolName(record.school_id) || '-' }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Average score</span>
+          <span class="meta-label">Moyenne</span>
           <strong>{{ record.average_score ?? '-' }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Attendance rate</span>
-          <strong>{{ record.attendance_rate ?? '-' }}</strong>
+          <span class="meta-label">Taux de présence</span>
+          <strong>{{
+            record.attendance_rate !== null && record.attendance_rate !== undefined
+              ? `${record.attendance_rate}%`
+              : '-'
+          }}</strong>
         </div>
       </article>
     </div>
 
-    <app-modal v-if="showModal" title="Add Academic Record" centered @close="closeModal">
+    <app-modal v-if="showModal" title="Ajouter un historique scolaire" centered @close="closeModal">
       <div v-if="formError" class="alert alert-danger" role="alert">
         {{ formError }}
       </div>
 
       <form class="modal-form" @submit.prevent="submitRecord">
         <div class="field-block">
-          <label class="field-label" for="academic_year">Academic year</label>
-          <input id="academic_year" v-model="form.academic_year" type="text" class="field-input" />
+          <label class="field-label" for="academic_year">Année académique</label>
+          <AcademicYearSelect id="academic_year" v-model="form.academic_year" />
           <p v-if="errors.academic_year" class="field-error">{{ errors.academic_year }}</p>
         </div>
 
         <div class="field-block">
-          <label class="field-label" for="class_name">Class</label>
-          <input id="class_name" v-model="form.class_name" type="text" class="field-input" />
+          <label class="field-label" for="class_name">Classe</label>
+          <input
+            id="class_name"
+            v-model="form.class_name"
+            type="text"
+            class="field-input"
+            placeholder="Ex: CM1, 6ème..."
+          />
           <p v-if="errors.class_name" class="field-error">{{ errors.class_name }}</p>
         </div>
 
         <div class="field-block">
-          <label class="field-label" for="school_id">School</label>
+          <label class="field-label" for="school_id">École</label>
           <select id="school_id" v-model="form.school_id" class="field-input">
-            <option value="">Select a school</option>
+            <option value="">Sélectionner une école</option>
             <option v-for="school in schools" :key="school.id" :value="String(school.id)">
-              {{ school.name || school.school_name || `School #${school.id}` }}
+              {{ school.name || school.school_name || `École #${school.id}` }}
             </option>
           </select>
           <p v-if="errors.school_id" class="field-error">{{ errors.school_id }}</p>
         </div>
 
         <div class="field-block">
-          <label class="field-label" for="average_score">Average score</label>
-          <input id="average_score" v-model="form.average_score" type="number" step="0.01" class="field-input" />
+          <label class="field-label" for="average_score">Moyenne</label>
+          <input
+            id="average_score"
+            v-model="form.average_score"
+            type="number"
+            step="0.01"
+            class="field-input"
+            placeholder="Ex: 14.5"
+          />
         </div>
 
         <div class="field-block">
-          <label class="field-label" for="attendance_rate">Attendance rate</label>
-          <input id="attendance_rate" v-model="form.attendance_rate" type="number" step="0.01" class="field-input" />
+          <label class="field-label" for="attendance_rate">Taux de présence (%)</label>
+          <input
+            id="attendance_rate"
+            v-model="form.attendance_rate"
+            type="number"
+            step="0.01"
+            class="field-input"
+            placeholder="Ex: 95"
+          />
         </div>
       </form>
 
       <template #footer>
-        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">Cancel</button>
+        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">
+          Annuler
+        </button>
         <button type="button" class="primary-button" :disabled="saving" @click="submitRecord">
           <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
-          Save record
+          Enregistrer
         </button>
       </template>
     </app-modal>
@@ -99,6 +127,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import beneficiaryService from '@/services/beneficiaryService'
+import AcademicYearSelect from '@/components/shared/AcademicYearSelect.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 import { useToast } from '@/composables/useToast'
 
@@ -149,7 +178,10 @@ async function loadRecords() {
     const response = await beneficiaryService.getAcademicRecords(props.beneficiaryId)
     records.value = normalizeCollection(response)
   } catch (error) {
-    showToast({ type: 'error', message: error.response?.data?.message || 'Unable to load academic records.' })
+    showToast({
+      type: 'error',
+      message: error.response?.data?.message || "Impossible de charger l'historique scolaire.",
+    })
   } finally {
     loading.value = false
   }
@@ -177,9 +209,9 @@ function closeModal() {
 }
 
 function validate() {
-  errors.academic_year = form.academic_year.trim() ? '' : 'Academic year is required.'
-  errors.class_name = form.class_name.trim() ? '' : 'Class is required.'
-  errors.school_id = form.school_id ? '' : 'School is required.'
+  errors.academic_year = form.academic_year ? '' : "L'année académique est requise."
+  errors.class_name = form.class_name.trim() ? '' : 'La classe est requise.'
+  errors.school_id = form.school_id ? '' : "L'école est requise."
   return !errors.academic_year && !errors.class_name && !errors.school_id
 }
 
@@ -197,14 +229,14 @@ async function submitRecord() {
 
   try {
     await beneficiaryService.addAcademicRecord(props.beneficiaryId, {
-      academic_year: form.academic_year.trim(),
+      academic_year: form.academic_year,
       class_name: form.class_name.trim(),
       school_id: Number(form.school_id),
       average_score: form.average_score === '' ? null : Number(form.average_score),
       attendance_rate: form.attendance_rate === '' ? null : Number(form.attendance_rate),
     })
 
-    showToast({ type: 'success', message: 'Academic record added successfully.' })
+    showToast({ type: 'success', message: 'Historique scolaire enregistré avec succès.' })
     closeModal()
     await loadRecords()
     emit('updated')
@@ -212,14 +244,19 @@ async function submitRecord() {
     if (error.response?.status === 422 && error.response?.data?.errors) {
       const validationErrors = error.response.data.errors
       errors.academic_year = validationErrors.academic_year?.[0] || errors.academic_year
-      errors.class_name = validationErrors.class_name?.[0] || validationErrors.class?.[0] || errors.class_name
+      errors.class_name =
+        validationErrors.class_name?.[0] || validationErrors.class?.[0] || errors.class_name
       errors.school_id = validationErrors.school_id?.[0] || errors.school_id
-      formError.value = 'Please correct the academic record form.'
+      formError.value = "Veuillez corriger le formulaire de l'historique scolaire."
     } else {
-      formError.value = error.response?.data?.message || 'Unable to save academic record.'
+      formError.value =
+        error.response?.data?.message || "Impossible d'enregistrer l'historique scolaire."
     }
 
-    showToast({ type: 'error', message: formError.value || 'Unable to save academic record.' })
+    showToast({
+      type: 'error',
+      message: formError.value || "Impossible d'enregistrer l'historique scolaire.",
+    })
   } finally {
     saving.value = false
   }

@@ -19,10 +19,7 @@
         :key="page"
         :class="['page-item', { active: page === currentPage }]"
       >
-        <button
-          class="page-link"
-          @click="goToPage(page)"
-        >
+        <button class="page-link" @click="goToPage(page)">
           {{ page }}
         </button>
       </li>
@@ -56,29 +53,29 @@ export default defineComponent({
     currentPage: {
       type: Number,
       required: true,
-      default: 1
+      default: 1,
     },
     totalPages: {
       type: Number,
       required: true,
-      default: 1
+      default: 1,
     },
     totalItems: {
       type: Number,
-      default: 0
+      default: 0,
     },
     perPage: {
       type: Number,
-      default: 10
+      default: 10,
     },
     showInfo: {
       type: Boolean,
-      default: true
+      default: true,
     },
     maxVisiblePages: {
       type: Number,
-      default: 5
-    }
+      default: 5,
+    },
   },
   emits: ['page-changed'],
   computed: {
@@ -105,15 +102,15 @@ export default defineComponent({
       }
 
       return pages
-    }
+    },
   },
   methods: {
     goToPage(page) {
       if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
         this.$emit('page-changed', page)
       }
-    }
-  }
+    },
+  },
 })
 </script>
 

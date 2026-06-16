@@ -2,55 +2,61 @@
   <section class="tab-panel">
     <div class="tab-header">
       <div>
-        <h2 class="tab-title">Family History</h2>
-        <p class="tab-copy">Review guardian assignments over time and attach a new family profile when needed.</p>
+        <h2 class="tab-title">Profil familial</h2>
+        <p class="tab-copy">
+          Consultez l'historique des tuteurs et liez un nouveau profil familial si nécessaire.
+        </p>
       </div>
 
-      <button type="button" class="primary-button" @click="openModal">
-        Assign Family
-      </button>
+      <button type="button" class="primary-button" @click="openModal">Lier une famille</button>
     </div>
 
     <div v-if="loading" class="state-card">
       <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-      <span>Loading family history...</span>
+      <span>Chargement de l'historique familial...</span>
     </div>
 
     <div v-else-if="familyHistory.length === 0" class="empty-card">
-      No data
+      Aucun profil familial enregistré
     </div>
 
     <div v-else class="list-grid">
-      <article v-for="item in familyHistory" :key="item.id || `${item.family_profile_id}-${item.start_date}`" class="list-card">
+      <article
+        v-for="item in familyHistory"
+        :key="item.id || `${item.family_profile_id}-${item.start_date}`"
+        class="list-card"
+      >
         <div class="list-card__row">
-          <span class="meta-label">Guardian</span>
+          <span class="meta-label">Tuteur</span>
           <strong>{{ item.guardian_name || getFamilyLabel(item) }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Phone</span>
-          <strong>{{ item.phone || item.guardian_phone || item.family_profile?.phone || '-' }}</strong>
+          <span class="meta-label">Téléphone</span>
+          <strong>{{
+            item.phone || item.guardian_phone || item.family_profile?.phone || '-'
+          }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">Start date</span>
+          <span class="meta-label">Date de début</span>
           <strong>{{ formatDate(item.start_date) }}</strong>
         </div>
         <div class="list-card__row">
-          <span class="meta-label">End date</span>
+          <span class="meta-label">Date de fin</span>
           <strong>{{ formatDate(item.end_date) }}</strong>
         </div>
       </article>
     </div>
 
-    <app-modal v-if="showModal" title="Assign Family" centered @close="closeModal">
+    <app-modal v-if="showModal" title="Lier une famille" centered @close="closeModal">
       <div v-if="formError" class="alert alert-danger" role="alert">
         {{ formError }}
       </div>
 
       <form class="modal-form" @submit.prevent="submitFamilyAssignment">
         <div class="field-block">
-          <label class="field-label" for="family_profile_id">Family profile</label>
+          <label class="field-label" for="family_profile_id">Profil familial</label>
           <select id="family_profile_id" v-model="form.family_profile_id" class="field-input">
-            <option value="">Select family profile</option>
+            <option value="">Sélectionner un profil familial</option>
             <option v-for="option in familyOptions" :key="option.id" :value="String(option.id)">
               {{ getFamilyLabel(option) }}
             </option>
@@ -59,23 +65,30 @@
         </div>
 
         <div class="field-block">
-          <label class="field-label" for="start_date">Start date</label>
+          <label class="field-label" for="start_date">Date de début</label>
           <input id="start_date" v-model="form.start_date" type="date" class="field-input" />
           <p v-if="errors.start_date" class="field-error">{{ errors.start_date }}</p>
         </div>
 
         <div class="field-block">
-          <label class="field-label" for="end_date">End date</label>
+          <label class="field-label" for="end_date">Date de fin</label>
           <input id="end_date" v-model="form.end_date" type="date" class="field-input" />
           <p v-if="errors.end_date" class="field-error">{{ errors.end_date }}</p>
         </div>
       </form>
 
       <template #footer>
-        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">Cancel</button>
-        <button type="button" class="primary-button" :disabled="saving" @click="submitFamilyAssignment">
+        <button type="button" class="ghost-button" :disabled="saving" @click="closeModal">
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="primary-button"
+          :disabled="saving"
+          @click="submitFamilyAssignment"
+        >
           <span v-if="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
-          Save assignment
+          Enregistrer
         </button>
       </template>
     </app-modal>
@@ -165,18 +178,23 @@ async function loadFamilyHistory() {
       end_date: item.end_date || item.pivot?.end_date || '',
     }))
   } catch (error) {
-    showToast({ type: 'error', message: error.response?.data?.message || 'Unable to load family history.' })
+    showToast({
+      type: 'error',
+      message: error.response?.data?.message || "Impossible de charger l'historique familial.",
+    })
   } finally {
     loading.value = false
   }
 }
 
 function getFamilyLabel(item) {
-  return item.guardian_name
-    || item.family_profile?.guardian_name
-    || item.family_name
-    || item.name
-    || `Family #${item.id || item.family_profile_id || 'N/A'}`
+  return (
+    item.guardian_name ||
+    item.family_profile?.guardian_name ||
+    item.family_name ||
+    item.name ||
+    `Famille #${item.id || item.family_profile_id || 'N/A'}`
+  )
 }
 
 function formatDate(value) {
@@ -204,12 +222,12 @@ function closeModal() {
 }
 
 function validate() {
-  errors.family_profile_id = form.family_profile_id ? '' : 'Family profile is required.'
-  errors.start_date = form.start_date ? '' : 'Start date is required.'
+  errors.family_profile_id = form.family_profile_id ? '' : 'Le profil familial est requis.'
+  errors.start_date = form.start_date ? '' : 'La date de début est requise.'
   errors.end_date = ''
 
   if (form.end_date && form.start_date && form.end_date < form.start_date) {
-    errors.end_date = 'End date cannot be before start date.'
+    errors.end_date = 'La date de fin ne peut pas être antérieure à la date de début.'
   }
 
   return !errors.family_profile_id && !errors.start_date && !errors.end_date
@@ -228,7 +246,7 @@ async function submitFamilyAssignment() {
       end_date: form.end_date || null,
     })
 
-    showToast({ type: 'success', message: 'Family assignment saved successfully.' })
+    showToast({ type: 'success', message: 'Liaison familiale enregistrée avec succès.' })
     closeModal()
     await loadFamilyHistory()
     emit('updated')
@@ -238,12 +256,16 @@ async function submitFamilyAssignment() {
       errors.family_profile_id = validationErrors.family_profile_id?.[0] || errors.family_profile_id
       errors.start_date = validationErrors.start_date?.[0] || errors.start_date
       errors.end_date = validationErrors.end_date?.[0] || errors.end_date
-      formError.value = 'Please correct the family assignment form.'
+      formError.value = 'Veuillez corriger le formulaire de liaison familiale.'
     } else {
-      formError.value = error.response?.data?.message || 'Unable to save family assignment.'
+      formError.value =
+        error.response?.data?.message || "Impossible d'enregistrer la liaison familiale."
     }
 
-    showToast({ type: 'error', message: formError.value || 'Unable to save family assignment.' })
+    showToast({
+      type: 'error',
+      message: formError.value || "Impossible d'enregistrer la liaison familiale.",
+    })
   } finally {
     saving.value = false
   }
